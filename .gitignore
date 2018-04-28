@@ -1,5 +1,9 @@
+#
+
 #bangs de digital
 *.pgm
+*.png
+
 
 # Prerequisites
 *.d

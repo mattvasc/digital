@@ -24,8 +24,9 @@ int main(void)
 	struct fp_dev *dev;
 	struct fp_print_data *data = NULL;
     struct fp_img *img = NULL;
-    char nome_arquivo[64];
+    char nome_arquivo[64], comando[80], valor;
     int c;
+	FILE *arq;
 
     r = fp_init();
 	if (r < 0) {
@@ -65,17 +66,59 @@ int main(void)
     printf("\nScan your finger now.\n");
     for(c = 0; c< 5 ; c++)
     {
-        sleep(1);
-        r = fp_verify_finger_img(dev, data, &img);
+		sleep(1);
+        while(fp_dev_img_capture 	(dev, 0, &img))	  
+		{
+			sleep(1);
+		}
+		
+        
         if (img) 
         {
-            printf("Digite o nome do arquivo para salvar: ");
-            fgets(nome_arquivo, 63, stdin);
-            nome_arquivo[strlen(nome_arquivo) - 1 ] = '\0';
-            strcat(nome_arquivo, ".pgm");
+
+            strcpy(nome_arquivo, "temp.pgm");
+			fp_img_standardize(img);
+			img = fp_img_binarize(img);
             fp_img_save_to_file(img, nome_arquivo);
-            printf("Wrote scanned image to verify.pgm\n");
+			strcpy(comando , "convert ");
+			strcat(comando, nome_arquivo);
+			strcat(comando, " ");
+			strcat(comando, nome_arquivo);
+			comando[strlen(comando)-2] = 'n';
+			comando[strlen(comando)-1] = 'g';
+			// Convertendo imagem pgm para png
+			system(comando);
+			strcpy(comando, "rm ");
+			strcat(comando, nome_arquivo);
+			// Apagando imagem pgm
+			system(comando);
+            
             fp_img_free(img);
+
+			arq = popen("./erro.m temp.png", "r");
+			if (!arq) {
+    			printf("Falha ao rodar script octave!\n" );
+    			exit(1);
+			}
+
+			valor = fgetc(arq);
+
+			if(valor == '1'){
+				c--;
+				printf("Erro ao ler dedo, por favor tente novamente!\n");
+			}
+			else
+			{
+				printf("Digite o nome do arquivo para salvar: ");
+	            fgets(comando, 63, stdin);
+            	comando[strlen(comando) - 1 ] = '\0';
+			
+				printf("Imagem salva com sucesso!\n");
+			}
+	
+			
+			
+
        }
     }
     
