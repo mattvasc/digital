@@ -1,28 +1,15 @@
-/*
- * Example fingerprint enrollment program
- * Enrolls your right index finger and saves the print to disk
- * Copyright (C) 2007 Daniel Drake <dsd@gentoo.org>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+
+// Compile with the flags: -lfprint -l sqlite3
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <pwd.h>
+#include <sys/types.h>
 #include <libfprint/fprint.h>
+#include <string.h>
+#include <sqlite3.h> 
+
 
 struct fp_dscv_dev *discover_device(struct fp_dscv_dev **discovered_devs)
 {
@@ -96,18 +83,109 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 	return enrolled_print;
 }
 
+// CALLBACKS for sqlite3 ***********************************************************************
+static int get_int(void *data, int argc, char **argv, char **azColName){
+    int *result = (int) data;
+    *result = (argv[0]) ? atoi(argv[0]) : 0 ; 
+   return (argv[0]) ? 0 : -1  ;
+}
+
+
+
+// ********************************************************************************************
+int create_user() {
+
+	sqlite3 * db;
+	int rc;
+	int * count = (int * ) malloc(sizeof(int));
+	int user_id;
+	char * zErrMsg;
+	char * sql;
+	struct passwd * pw = getpwuid(getuid());
+	const char * homedir = pw->pw_dir;
+	char * dblocale = (char * ) malloc(256);
+	char username[128] = "",	email[256] = "",	phone[64] = "";
+
+	strcpy(dblocale, homedir);
+	strcat(dblocale, "/.fprint/database.db");
+
+	rc = sqlite3_open(dblocale, & db);
+	free(dblocale);
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return (0);
+	} else
+		fprintf(stderr, "Opened database successfully\n\nPlease supply your name: ");
+
+	
+	fgets(username, 127, stdin);
+	printf("email: ");
+	fgets(email, 255, stdin);
+	printf("phone (enter for none): ");
+	fgets(phone, 63, stdin);
+
+	username[strlen(username) - 1] = '\0';
+	email[strlen(email) - 1] = '\0';
+	phone[strlen(phone) - 1] = '\0';
+
+	sql = malloc(512);
+	//TODO: SQL INJECTION PROTECTION
+	sprintf(sql, "INSERT INTO `user`(name, email, phone) VALUES( '%s', '%s', '%s' ); ", username, email, phone);
+	rc = sqlite3_exec(db, sql, NULL, NULL, & zErrMsg);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		user_id = -1;
+	} else {
+		sprintf(sql, "SELECT id FROM `user` WHERE name = '%s' AND email = '%s'; ", username, email);
+		rc = sqlite3_exec(db, sql, get_int, count, &zErrMsg);
+		if (rc != SQLITE_OK) {
+			fprintf(stderr, "SQL error: %s\n", zErrMsg);
+			sqlite3_free(zErrMsg);
+			user_id = -1;
+		} else {
+
+			user_id = * count;
+			free(count);
+			sprintf(sql, "INSERT INTO `fingerprints`(userid, fingerprint_id) VALUES( %d, '%d' ); ", user_id, user_id);
+			rc = sqlite3_exec(db, sql, NULL, NULL, & zErrMsg);
+			if (rc != SQLITE_OK) {
+				fprintf(stderr, "SQL error: %s\n", zErrMsg);
+				sqlite3_free(zErrMsg);
+				user_id = -1;
+			}
+		}
+	}
+
+	free(sql);
+	sqlite3_close(db);
+
+	return user_id;
+
+}
+
+void update_user(){
+ //... TODO
+}
+
 int main(void)
 {
+	
+	
+
+
 	int r = 1;
 	struct fp_dscv_dev *ddev;
 	struct fp_dscv_dev **discovered_devs;
 	struct fp_dev *dev;
 	struct fp_print_data *data;
 
-	printf("This program will enroll your right index finger, "
-		"unconditionally overwriting any right-index print that was enrolled "
-		"previously. If you want to continue, press enter, otherwise hit "
-		"Ctrl+C\n");
+    int finger_id;
+    
+	finger_id = create_user();
+    
+	printf("Record now your finger, press enter to continue or CTRL+C to cancel\n");
 	getchar();
 
 	r = fp_init();
@@ -141,7 +219,9 @@ int main(void)
 	if (!data)
 		goto out_close;
 
-	r = fp_print_data_save(data, RIGHT_INDEX);
+	printf("Going to save a new user with the finger_id: %d\n", finger_id);
+	r = fp_print_data_save(data, finger_id);
+	
 	if (r < 0)
 		fprintf(stderr, "Data save failed, code %d\n", r);
 
@@ -152,5 +232,4 @@ out:
 	fp_exit();
 	return r;
 }
-
 
