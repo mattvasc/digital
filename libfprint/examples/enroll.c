@@ -85,7 +85,7 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 
 // CALLBACKS for sqlite3 ***********************************************************************
 static int get_int(void *data, int argc, char **argv, char **azColName){
-    int *result = (int) data;
+    int *result = (int*) data;
     *result = (argv[0]) ? atoi(argv[0]) : 0 ; 
    return (argv[0]) ? 0 : -1  ;
 }
