@@ -510,3 +510,4 @@ API_EXPORTED int fp_async_capture_stop(struct fp_dev *dev,
 	}
 	return r;
 }
+
