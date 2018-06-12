@@ -318,28 +318,25 @@ static void verify_stop_cb(struct fp_dev *dev, void *user_data)
  * \return negative code on error, otherwise a code from #fp_verify_result
  */
 API_EXPORTED int fp_verify_finger_img(struct fp_dev *dev,
-	struct fp_print_data *enrolled_print, struct fp_img **img, struct sync_verify_data **vdata)
+	struct fp_print_data *enrolled_print, struct fp_img **img)
 {
-	;
+	struct sync_verify_data *vdata;
 	gboolean stopped = FALSE;
 	int r;
 
-    // Enrolled_print is the received one.
 	if (!enrolled_print) {
 		fp_err("no print given");
 		return -EINVAL;
 	}
-    if(!*vdata)
-    {
-	    if (!fp_dev_supports_print_data(dev, enrolled_print)) {
-		    fp_err("print is not compatible with device");
-		    return -EINVAL;
-	    }
 
-	    fp_dbg("to be handled by %s", dev->drv->name);
-	    vdata = g_malloc0(sizeof(struct sync_verify_data));
-    }
-	r = fp_async_verify_start(dev, enrolled_print, sync_verify_cb, *vdata);
+	if (!fp_dev_supports_print_data(dev, enrolled_print)) {
+		fp_err("print is not compatible with device");
+		return -EINVAL;
+	}
+
+	fp_dbg("to be handled by %s", dev->drv->name);
+	vdata = g_malloc0(sizeof(struct sync_verify_data));
+	r = fp_async_verify_start(dev, enrolled_print, sync_verify_cb, vdata);
 	if (r < 0) {
 		fp_dbg("verify_start error %d", r);
 		g_free(vdata);
