@@ -47,12 +47,10 @@ int verify_user_and_log(int finger_id)
 
 	sqlite3 * db; char * zErrMsg; char * sql;
 
-	struct passwd * pw = getpwuid(getuid());
-	const char * homedir = pw->pw_dir;
+
 	char * dblocale = (char * ) malloc(256);
-	int *userid = (int*) malloc(sizeof(int)); int temp;
-	strcpy(dblocale, homedir);
-	strcat(dblocale, "/.fprint/database.db");
+
+	strcpy(dblocale, "/digitais/database.db");
 	int rc;
 
 	
