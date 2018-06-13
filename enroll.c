@@ -213,25 +213,21 @@ int main(void)
 	}
 
 	printf("Opened device. It's now time to enroll your finger.\n\n");
-printf("-1");
+
 	data = enroll(dev);
 	if (!data)
 		goto out_close;
 
 	printf("Going to save a new user with the finger_id: %d\n", finger_id);
-	printf("0");
+	
 	r = fp_print_data_save(data, finger_id);
-	printf("0/");
 		
 	if (r < 0)
 		fprintf(stderr, "Data save failed, code %d\n", r);
-	printf("1");
+	
 	fp_print_data_free(data);
-	printf("1/");
 out_close:
-	printf("2");
 	fp_dev_close(dev);
-	printf("2/");
 out:
 	fp_exit();
 	return r;
