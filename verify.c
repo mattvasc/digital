@@ -52,6 +52,8 @@ int verify_user_and_log(int finger_id)
 
 	strcpy(dblocale, "/digitais/database.db");
 	int rc;
+	int temp;
+	int *userid = (int*) malloc(sizeof(int));
 
 	
 	rc = sqlite3_open(dblocale, & db);
