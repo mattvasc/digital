@@ -203,6 +203,15 @@ static void verify_process_img(struct fp_img_dev *imgdev)
 	imgdev->action_result = r;
 }
 
+API_EXPORTED int verify_process(struct fp_print_data *imgdev, struct fp_print_data *imgdev2){
+
+	return fpi_img_compare_print_data(imgdev, imgdev2);
+}
+
+API_EXPORTED void set_nr_enroll_stages(struct fp_dev *dev){
+	dev->nr_enroll_stages = 1;
+}
+
 static void identify_process_img(struct fp_img_dev *imgdev)
 {
 	struct fp_img_driver *imgdrv = fpi_driver_to_img_driver(imgdev->dev->drv);

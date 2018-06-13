@@ -360,12 +360,15 @@ int fpi_img_compare_print_data(struct fp_print_data *enrolled_print,
 		return -EINVAL;
 	}
 
+	/*
+	Removida para aceitar uma digital que foi lida!!!
 	if (g_slist_length(new_print->prints) != 1) {
 		fp_err("new_print contains more than one sample, is it enrolled print?");
 		return -EINVAL;
 	}
-
-	data_item = new_print->prints->data;
+	*/
+	//TODO: verificar se precisa aumentar a precisão!
+	data_item = new_print->prints[0].data;
 	pstruct = (struct xyt_struct *)data_item->data;
 
 	probe_len = bozorth_probe_init(pstruct);

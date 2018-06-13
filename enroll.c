@@ -85,7 +85,7 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 
 // CALLBACKS for sqlite3 ***********************************************************************
 static int get_int(void *data, int argc, char **argv, char **azColName){
-    int *result = (int) data;
+    int *result = (int *)data;
     *result = (argv[0]) ? atoi(argv[0]) : 0 ; 
    return (argv[0]) ? 0 : -1  ;
 }
@@ -100,7 +100,7 @@ int create_user() {
 	int * count = (int * ) malloc(sizeof(int));
 	int user_id;
 	char * zErrMsg;
-	char * sql;
+	char * sql; 
 	struct passwd * pw = getpwuid(getuid());
 	const char * homedir = pw->pw_dir;
 	char * dblocale = (char * ) malloc(256);
@@ -127,7 +127,10 @@ int create_user() {
 	username[strlen(username) - 1] = '\0';
 	email[strlen(email) - 1] = '\0';
 	phone[strlen(phone) - 1] = '\0';
-
+	if(!strlen(email) || !strlen(username)){
+		fprintf(stderr, "ERROR PLEASE INPUT NAME AND EMAIL!\n\n");
+		return -1;
+	}
 	sql = malloc(512);
 	//TODO: SQL INJECTION PROTECTION
 	sprintf(sql, "INSERT INTO `user`(name, email, phone) VALUES( '%s', '%s', '%s' ); ", username, email, phone);
@@ -172,9 +175,6 @@ void update_user(){
 int main(void)
 {
 	
-	
-
-
 	int r = 1;
 	struct fp_dscv_dev *ddev;
 	struct fp_dscv_dev **discovered_devs;
@@ -185,8 +185,8 @@ int main(void)
     
 	finger_id = create_user();
     
-	printf("Record now your finger, press enter to continue or CTRL+C to cancel\n");
-	getchar();
+	printf("Record now your finger, press CTRL+C to cancel\n");
+
 
 	r = fp_init();
 	if (r < 0) {
@@ -232,5 +232,4 @@ out:
 	fp_exit();
 	return r;
 }
-
 
