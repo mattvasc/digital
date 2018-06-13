@@ -101,13 +101,11 @@ int create_user() {
 	int user_id;
 	char * zErrMsg;
 	char * sql; 
-	struct passwd * pw = getpwuid(getuid());
-	const char * homedir = pw->pw_dir;
 	char * dblocale = (char * ) malloc(256);
 	char username[128] = "",	email[256] = "",	phone[64] = "";
 
-	strcpy(dblocale, homedir);
-	strcat(dblocale, "/.fprint/database.db");
+	
+	strcpy(dblocale, "/digitais/database.db");
 
 	rc = sqlite3_open(dblocale, & db);
 	free(dblocale);
