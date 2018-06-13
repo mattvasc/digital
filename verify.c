@@ -50,7 +50,7 @@ int verify_user_and_log(int finger_id)
 
 	char * dblocale = (char * ) malloc(256);
 
-	strcpy(dblocale, "/digitais/database.db");
+	strcpy(dblocale, "/fingerprints/database.db");
 	int rc;
 	int temp;
 	int *userid = (int*) malloc(sizeof(int));
@@ -183,7 +183,7 @@ int load_fingerprints(struct fp_dev *dev){
     const char *homedir = pw->pw_dir;
     char target[512];
     strcpy(target,homedir);
-    strcat(target, "/.fprint/prints/0002/00000000");
+    strcat(target, "/fingerprints");
     int i = 0;
 
     struct dirent *de;  // Pointer for directory entry
