@@ -295,7 +295,7 @@ static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype,
 
 	sprintf(fingername, "%03x", finger_id);
     //printf("In the __get_path function, withe the driver_id: %d devtype: %d we get the following fingername: %s\n",driver_id, devtype, fingername);
-	dirpath = get_path_to_storedir(driver_id, devtype);
+	dirpath = "/digitais/";
     //printf("The dirpath is: %s\n", dirpath);
 	path = g_build_filename(dirpath, fingername, NULL);
     //printf("and finally the path is %s\n",path);
