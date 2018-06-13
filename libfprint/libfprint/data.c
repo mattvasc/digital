@@ -25,6 +25,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <string.h>
+
 #include <glib.h>
 #include <glib/gstdio.h>
 
@@ -288,18 +290,19 @@ static char *get_path_to_storedir(uint16_t driver_id, uint32_t devtype)
 static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype,
 	int finger_id)
 {
-	char *dirpath;
+	char dirpath[100];
 	char *path;
 	char fingername[4];
     fingername[3] = '\0';
 
 	sprintf(fingername, "%03x", finger_id);
     //printf("In the __get_path function, withe the driver_id: %d devtype: %d we get the following fingername: %s\n",driver_id, devtype, fingername);
-	dirpath = "/digitais/";
+//	dirpath = "/digitais/";
+	strcpy(dirpath,"/fingerprints/");
     //printf("The dirpath is: %s\n", dirpath);
 	path = g_build_filename(dirpath, fingername, NULL);
     //printf("and finally the path is %s\n",path);
-	g_free(dirpath);
+	//g_free(dirpath);
 	return path;
 }
 
