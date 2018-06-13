@@ -105,7 +105,7 @@ int create_user() {
 	char username[128] = "",	email[256] = "",	phone[64] = "";
 
 	
-	strcpy(dblocale, "/digitais/database.db");
+	strcpy(dblocale, "/fingerprints/database.db");
 
 	rc = sqlite3_open(dblocale, & db);
 	free(dblocale);
