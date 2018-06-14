@@ -254,7 +254,15 @@ int main(void)
 	
 	
 	printf("*** Welcome to the Fingerprint System!***\n\n");
-  
+  	char * dblocale = (char * ) malloc(256);
+	strcpy(dblocale, "/fingerprints/database.db");
+	r = sqlite3_open(dblocale, & db);
+	
+	free(dblocale);
+	if (r) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		exit(1);
+	}
 	r = fp_init();
 	if (r < 0) {
 		fprintf(stderr, "Failed to initialize libfprint\n");
@@ -281,14 +289,7 @@ int main(void)
 		goto out;
 	}
 
-	char * dblocale = (char * ) malloc(256);
-	strcpy(dblocale, "/fingerprints/database.db");
-	r = sqlite3_open(dblocale, & db);
-	free(dblocale);
-	if (r) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return (1);
-	}
+	
 
 
 	while(1){
