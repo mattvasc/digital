@@ -9,7 +9,7 @@
 #include <libfprint/fprint.h>
 #include <string.h>
 #include <sqlite3.h> 
-
+#include <ctype.h>
 
 struct fp_dev *dev;
 struct fp_print_data *data;
@@ -96,6 +96,11 @@ static int get_int(void *data, int argc, char **argv, char **azColName){
    return (argv[0]) ? 0 : -1  ;
 }
 
+static int print_table(void *data, int argc, char **argv, char **azColName){
+    int *result = (int *)data;
+    *result = (argv[0]) ? atoi(argv[0]) : 0 ; 
+   return 0;
+}
 
 
 // ********************************************************************************************

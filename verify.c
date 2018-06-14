@@ -179,11 +179,11 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 }
 
 int load_fingerprints(struct fp_dev *dev){
-	struct passwd *pw = getpwuid(getuid());
-    const char *homedir = pw->pw_dir;
+	//struct passwd *pw = getpwuid(getuid());
+    //const char *homedir = pw->pw_dir;
     char target[512];
-    strcpy(target,homedir);
-    strcat(target, "/fingerprints");
+   // strcpy(target,homedir);
+    strcpy(target, "/fingerprints/");
     int i = 0;
 
     struct dirent *de;  // Pointer for directory entry
@@ -193,7 +193,7 @@ int load_fingerprints(struct fp_dev *dev){
 
     //Reseta quantidade de digital
     qtd = 0;
- 
+ printf("%s\n", target);
     if (dr == NULL)  // opendir returns NULL if couldn't open directory
     {
         printf("Could not open current directory" );
@@ -281,7 +281,7 @@ int main(void)
 			r = verify_process(dataGallery[i], data);
 
 			if (r >= 76){
-				
+				printf("POD ENTRA\n");
 				r = verify_user_and_log(filesnumbers[i]);
 				if(r!=-1)
 				{
