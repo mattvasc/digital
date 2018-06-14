@@ -11,6 +11,12 @@
 #include <sqlite3.h> 
 
 
+struct fp_dev *dev;
+struct fp_print_data *data;
+
+sqlite3 * db;
+char * zErrMsg;
+
 struct fp_dscv_dev *discover_device(struct fp_dscv_dev **discovered_devs)
 {
 	struct fp_dscv_dev *ddev = discovered_devs[0];
@@ -95,25 +101,17 @@ static int get_int(void *data, int argc, char **argv, char **azColName){
 // ********************************************************************************************
 int create_user() {
 
-	sqlite3 * db;
-	int rc;
+	
+	int rc, aux1, aux2;
 	int * count = (int * ) malloc(sizeof(int));
 	int user_id;
-	char * zErrMsg;
+	
 	char * sql; 
-	char * dblocale = (char * ) malloc(256);
+	
+
 	char username[128] = "",	email[256] = "",	phone[64] = "";
 
-	
-	strcpy(dblocale, "/fingerprints/database.db");
-
-	rc = sqlite3_open(dblocale, & db);
-	free(dblocale);
-	if (rc) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return (0);
-	} else
-		fprintf(stderr, "Opened database successfully\n\nPlease supply your name: ");
+	printf("\nPlease supply your name: ");
 
 	
 	fgets(username, 127, stdin);
@@ -149,7 +147,27 @@ int create_user() {
 
 			user_id = * count;
 			free(count);
-			sprintf(sql, "INSERT INTO `fingerprints`(userid, fingerprint_id) VALUES( %d, '%d' ); ", user_id, user_id);
+			
+			while(1){
+				printf("Please inform what finger will be enroled:\n");
+				printf("1)Left Thumb\t2)Right Thumb\n3)Left Index\t4)Right Index\n5)Left Middle\t6)Right Middle\n7)Left Ringer\t8)Right Ringer\n9)Left Pinkie\t10)Right Pinkie\nSelected Option: ");
+				aux2 = scanf("%d%*c", &aux1);
+				if(aux2 && aux1>=1 && aux1<=10) 
+					break;
+				printf("Didn't Understand, please try again...\n");
+			}
+			printf("It's now time to enroll your finger.\n\n");
+			data = enroll(dev);
+			if (!data)
+			{
+				fp_dev_close(dev);
+				fp_exit();
+				//printf("There was an error while enrolling the user fingerprint, the user %s will be deleted, please try to ");
+				exit(1);
+			}
+
+
+			sprintf(sql, "INSERT INTO `fingerprints`(userid, fingerprint_id, finger) VALUES( %d, %d, %d ); ", user_id, user_id, rc);
 			rc = sqlite3_exec(db, sql, NULL, NULL, & zErrMsg);
 			if (rc != SQLITE_OK) {
 				fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -160,50 +178,109 @@ int create_user() {
 	}
 
 	free(sql);
-	sqlite3_close(db);
+
+
+
+	
+
+	
+	printf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);
+	
+	fp_print_data_free(data);
 
 	return user_id;
 
 }
 
-void update_user(){
- //... TODO
+
+//Ask for user info, and return userid
+int select_user(){
+	//TODO
+	char username[64], *p, sql[128];
+	int rc;
+	printf("Inform the full or a part of the person name (enter for all): ");
+	fgets(username,63,stdin);
+	username[strlen(username)-1] = '\0';
+	for (p = username ; *p; p++) *p = tolower(*p); //str2lower
+
+	sprintf("SELECT * FROM `user` WHERE name LIKE '\%%s\%' ORDER BY name ASC;", username);
+	// PASSAR COMO PARAMETRO AO CALLBACK UMA LISTA LIGADA zzzzzzzzzzz
+	rc = sqlite3_exec(db, sql, print_table, NULL, &zErrMsg);
+	if (rc != SQLITE_OK) {
+		printf("ERROR: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		return -1;
+	}
+
+	/*
+		fgets name
+		search for name in sqlite
+		printf which one is the user?
+		return userid
+	*/
+	return 0;
 }
+
+
+void update_user(){
+ //TODO
+	int userid;
+	userid = select_user();
+}
+void add_fingerprint(){
+ //TODO
+}
+void delete_user(){
+	//TODO:
+	int userid;
+	userid = select_user();
+}
+
+
+
+
 
 int main(void)
 {
 	
-	int r = 1;
+	int r = 0;
 	struct fp_dscv_dev *ddev;
 	struct fp_dscv_dev **discovered_devs;
-	struct fp_dev *dev;
-	struct fp_print_data *data;
-
-    int finger_id;
-    
-	finger_id = create_user();
-    
-	printf("Record now your finger, press CTRL+C to cancel\n");
-
-
+	
+	
+	printf("*** Welcome to the Fingerprint System!***\n\n");
+  	char * dblocale = (char * ) malloc(256);
+	strcpy(dblocale, "/fingerprints/database.db");
+	r = sqlite3_open(dblocale, & db);
+	
+	free(dblocale);
+	if (r) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		exit(1);
+	}
 	r = fp_init();
 	if (r < 0) {
 		fprintf(stderr, "Failed to initialize libfprint\n");
 		exit(1);
 	}
 	fp_set_debug(3);
-
 	discovered_devs = fp_discover_devs();
 	if (!discovered_devs) {
-		fprintf(stderr, "Could not discover devices\n");
+		fprintf(stderr, "Could not discover devices, maybe permission issue?\n");
 		goto out;
 	}
 
 	ddev = discover_device(discovered_devs);
 	if (!ddev) {
-		fprintf(stderr, "No devices detected.\n");
+		fprintf(stderr, "No devices detected, aborting.\n");
 		goto out;
 	}
+
 
 	dev = fp_dev_open(ddev);
 	fp_dscv_devs_free(discovered_devs);
@@ -212,24 +289,48 @@ int main(void)
 		goto out;
 	}
 
-	printf("Opened device. It's now time to enroll your finger.\n\n");
-
-	data = enroll(dev);
-	if (!data)
-		goto out_close;
-
-	printf("Going to save a new user with the finger_id: %d\n", finger_id);
 	
-	r = fp_print_data_save(data, finger_id);
-		
-	if (r < 0)
-		fprintf(stderr, "Data save failed, code %d\n", r);
+
+
+	while(1){
+		printf("Please choose a option:\n");
+		while(1){
+			printf("1)Register a new User\n2)Register a New Finger\n3)Update an Existing User\n4)Delete a existing User\n5)Exit\nSelected Option: ");
+			scanf("%d%*c", &r);
+			if(r >= 1 && r <= 5)
+				break;
+			printf("\nDidn't understand please choose one of the following option:\n");
+		}
+		switch(r){
+			case 1:
+				create_user();
+				break;
+			case 2:
+				printf("Will be implemented!\n");
+				add_fingerprint();
+				break;
+			case 3:
+				printf("Will be implemented!\n");
+				update_user();
+				break;
+			case 4:
+				printf("Will be implemented!\n");
+				delete_user();
+				break;
+			case 5:
+				printf("Bye!\n");
+				goto out_close;
+		}
+	}
 	
-	fp_print_data_free(data);
+	printf("Record now your finger, press CTRL+C to cancel\n");
+
+	
 out_close:
 	fp_dev_close(dev);
 out:
 	fp_exit();
+	sqlite3_close(db);
 	return r;
 }
 
