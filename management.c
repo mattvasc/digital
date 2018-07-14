@@ -267,7 +267,7 @@ int main(void)
 	
 	if(!getenv("SUDO_UID"))
 	{
-		printf("Error! The program must run with sudo privileges!\n\n");
+		printf("\nError! The program must run with sudo privileges!\n\n");
 		return -1;
 	}
 	printf("*** Welcome to the Fingerprint System!***\n\n");
