@@ -10,6 +10,8 @@
 #include <string.h>
 #include <sqlite3.h> 
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 struct fp_dev *dev;
 struct fp_print_data *data;
@@ -260,15 +262,28 @@ int main(void)
 	int r = 0;
 	struct fp_dscv_dev *ddev;
 	struct fp_dscv_dev **discovered_devs;
-	
+	pid_t child_pid;
+
 	
 	printf("*** Welcome to the Fingerprint System!***\n\n");
-
-	printf("Stopping the daemon of verifying");
 	char *command = "service";
-	char *arguments[] = { "service", "digital", "stop", NULL };
-	execvp(command, arguments);	
+	
+	child_pid = fork();
+
+  	if(child_pid == 0) {
+		/* This is done by the child process. */
+		printf("Stopping the daemon of verifying");
+		
+		char *arguments[] = { "service", "digital", "stop", NULL };
+		execvp(command, arguments);	
+		
+	}else {
+     /* This is run by the parent.  Wait for the child
+        to terminate. */
+
+	waitpid(child_pid, &r,0);
 	printf("Daemon stopped sucefully!");
+  }
 
   	char * dblocale = (char * ) malloc(256);
 	strcpy(dblocale, "/fingerprints/database.db");
@@ -334,11 +349,20 @@ int main(void)
 				delete_user();
 				break;
 			case 5:
-				printf("Starting the daemon of verifying");
-				command = "service";
-				char *arguments2[] = { "service", "digital", "start", NULL };
-				execvp(command, arguments2);	
-				printf("Daemon started sucefully!");
+				child_pid = fork();
+				if(child_pid == 0) {
+					/* This is done by the child process. */
+					printf("Starting the daemon of verifying");
+					char *arguments2[] = { "service", "digital", "start", NULL };
+					execvp(command, arguments2);	
+
+				}else {
+					/* This is run by the parent.  Wait for the child
+					to terminate. */
+					waitpid(child_pid, &r,0);
+					printf("Daemon started sucefully!");
+				}
+
 				printf("Bye!\n");
 				goto out_close;
 		}
