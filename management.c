@@ -264,7 +264,12 @@ int main(void)
 	struct fp_dscv_dev **discovered_devs;
 	pid_t child_pid;
 
-	
+	const char* is_root = getenv("SUDO_UID");
+	if(strcmp(is_root,"1000"))
+	{
+		printf("Error! The program must run with sudo privileges!\n\n");
+		return -1;
+	}
 	printf("*** Welcome to the Fingerprint System!***\n\n");
 	char *command = "service";
 	
