@@ -276,26 +276,16 @@ API_EXPORTED struct fp_print_data *fp_print_data_from_data(unsigned char *buf,
 	return NULL;
 }
 
-static char *get_path_to_storedir(uint16_t driver_id, uint32_t devtype)
-{
-	char idstr[5];
-	char devtypestr[9];
 
-	g_snprintf(idstr, sizeof(idstr), "%04x", driver_id);
-	g_snprintf(devtypestr, sizeof(devtypestr), "%08x", devtype);
 
-	return g_build_filename(base_store, idstr, devtypestr, NULL);
-}
-
-static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype,
-	int finger_id)
+static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype, int user_id,	int finger_id)
 {
 	char dirpath[100];
 	char *path;
-	char fingername[4];
-    fingername[3] = '\0';
+	char fingername[16];
+	memset(fingername,'\0',15);
 
-	sprintf(fingername, "%03x", finger_id);
+	sprintf(fingername, "%d_%d", user_id,finger_id);
     //printf("In the __get_path function, withe the driver_id: %d devtype: %d we get the following fingername: %s\n",driver_id, devtype, fingername);
 //	dirpath = "/digitais/";
 	strcpy(dirpath,"/fingerprints/");
@@ -306,9 +296,9 @@ static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype,
 	return path;
 }
 
-static char *get_path_to_print(struct fp_dev *dev, int finger_id)
+static char *get_path_to_print(struct fp_dev *dev, int user_id, int finger_id)
 {
-	return __get_path_to_print(dev->drv->id, dev->devtype, finger_id);
+	return __get_path_to_print(dev->drv->id, dev->devtype, user_id, finger_id);
 }
 
 /** \ingroup print_data
@@ -326,7 +316,7 @@ static char *get_path_to_print(struct fp_dev *dev, int finger_id)
  * \param finger the finger that this print corresponds to
  * \returns 0 on success, non-zero on error.
  */
-API_EXPORTED int fp_print_data_save(struct fp_print_data *data,	int finger_id)
+API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id,	int finger_id)
 {
 	GError *err = NULL;
 	char *path;
@@ -338,14 +328,13 @@ API_EXPORTED int fp_print_data_save(struct fp_print_data *data,	int finger_id)
 	if (!base_store)
 		storage_setup();
 
-	fp_dbg("save %s print from driver %04x", finger_num_to_str(finger_id),
-		data->driver_id);
+	fp_dbg("save %s print from driver %04x", finger_num_to_str(finger_id), data->driver_id);
 	len = fp_print_data_get_data(data, &buf);
 	if (!len)
 		return -ENOMEM;
     
-	path = __get_path_to_print(data->driver_id, data->devtype, finger_id);
-    printf("For the finger_id %d we get the following path: %s\n\n", finger_id, path);
+	path = __get_path_to_print(data->driver_id, data->devtype, user_id,finger_id);
+    //printf("For the finger_id %d we get the following path: %s\n\n", user_id, finger_id, path);
 	dirpath = g_path_get_dirname(path);
 	r = g_mkdir_with_parents(dirpath, DIR_PERMS);
 	if (r < 0) {
@@ -435,7 +424,7 @@ static int load_from_file(char *path, struct fp_print_data **data)
  * freed with fp_print_data_free() after use.
  * \returns 0 on success, non-zero on error
  */
-API_EXPORTED int fp_print_data_load(struct fp_dev *dev,
+API_EXPORTED int fp_print_data_load(struct fp_dev *dev, int user_id,
 	int finger_id, struct fp_print_data **data)
 {
 	gchar *path;
@@ -445,7 +434,7 @@ API_EXPORTED int fp_print_data_load(struct fp_dev *dev,
 	if (!base_store)
 		storage_setup();
 
-	path = get_path_to_print(dev, finger_id);
+	path = get_path_to_print(dev, user_id, finger_id);
 	r = load_from_file(path, &fdata);
 	g_free(path);
 	if (r)
@@ -467,11 +456,11 @@ API_EXPORTED int fp_print_data_load(struct fp_dev *dev,
  * \param finger the finger of the file you are deleting
  * \returns 0 on success, negative on error
  */
-API_EXPORTED int fp_print_data_delete(struct fp_dev *dev,
+API_EXPORTED int fp_print_data_delete(struct fp_dev *dev, int user_id,
 	int finger_id)
 {
 	int r;
-	gchar *path = get_path_to_print(dev, finger_id);
+	gchar *path = get_path_to_print(dev, user_id, finger_id);
 
 	fp_dbg("remove finger with id %d at %s", finger_id, path);
 	r = g_unlink(path);

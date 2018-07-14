@@ -1,0 +1,4 @@
+libnss3-dev
+libpixman
+libusb1-0-dev
+libxv-dev

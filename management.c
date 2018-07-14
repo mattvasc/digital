@@ -37,19 +37,69 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 		"complete the process.\n", fp_dev_get_nr_enroll_stages(dev));
 
 	do {
-		struct fp_img *img = NULL;
+		struct fp_imprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc); *img = NULL;
 	
 		sleep(1);
-		printf("\nScan your finger now.\n");
+		printf("\nScprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);n your finger now.\n");
 
-		r = fp_enroll_finger_img(dev, &enrolled_print, &img);
+		r = fp_enrolprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);_finger_img(dev, &enrolled_print, &img);
 		if (img) {
-			fp_img_save_to_file(img, "enrolled.pgm");
-			printf("Wrote scanned image to enrolled.pgm\n");
-			fp_img_free(img);
+			fp_img_sprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);ve_to_file(img, "enrolled.pgm");
+			printf("prprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);intf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);rote scanned image to enrolled.pgm\n");
+			fp_img_fprintf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);ee(img);
 		}
-		if (r < 0) {
-			printf("Enroll failed with error %d\n", r);
+		if (r < 0) {printf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		printf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);
+			printf("printf("Going to save a new user with the user_id: %d\n", user_id);
+	
+	rc = fp_print_data_save(data, user_id, aux1);
+		
+	if (rc < 0)
+		fprintf(stderr, "Data save failed, code %d\n", rc);nroll failed with error %d\n", r);
 			return NULL;
 		}
 
@@ -172,7 +222,7 @@ int create_user() {
 			}
 
 
-			sprintf(sql, "INSERT INTO `fingerprints`(userid, fingerprint_id, finger) VALUES( %d, %d, %d ); ", user_id, user_id, rc);
+			sprintf(sql, "INSERT INTO `fingerprints`(userid, fingerprint_id, finger) VALUES( %d, %d, %d ); ", user_id, user_id, aux1);
 			rc = sqlite3_exec(db, sql, NULL, NULL, & zErrMsg);
 			if (rc != SQLITE_OK) {
 				fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -186,16 +236,14 @@ int create_user() {
 
 
 
-	
-
-	
 	printf("Going to save a new user with the user_id: %d\n", user_id);
 	
-	rc = fp_print_data_save(data, user_id);
+	rc = fp_print_data_save(data, user_id, aux1);
 		
 	if (rc < 0)
 		fprintf(stderr, "Data save failed, code %d\n", rc);
-	
+
+
 	fp_print_data_free(data);
 
 	return user_id;

@@ -244,12 +244,12 @@ static inline int fp_identify_finger(struct fp_dev *dev,
 }
 
 /* Data handling */
-int fp_print_data_load(struct fp_dev *dev, int finger_id,
+int fp_print_data_load(struct fp_dev *dev, int user_id, int finger_id,
 	struct fp_print_data **data);
 int fp_print_data_from_dscv_print(struct fp_dscv_print *print,
 	struct fp_print_data **data);
-int fp_print_data_save(struct fp_print_data *data, int finger_id);
-int fp_print_data_delete(struct fp_dev *dev, int finger_id);
+int fp_print_data_save(struct fp_print_data *data, int user_id, int finger_id);
+int fp_print_data_delete(struct fp_dev *dev, int user_id, int finger_id);
 void fp_print_data_free(struct fp_print_data *data);
 size_t fp_print_data_get_data(struct fp_print_data *data, unsigned char **ret);
 struct fp_print_data *fp_print_data_from_data(unsigned char *buf,
