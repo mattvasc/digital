@@ -272,7 +272,6 @@ int main(void)
 
   	if(child_pid == 0) {
 		/* This is done by the child process. */
-		printf("Stopping the daemon of verifying");
 		
 		char *arguments[] = { "service", "digital", "stop", NULL };
 		execvp(command, arguments);	
@@ -280,9 +279,9 @@ int main(void)
 	}else {
      /* This is run by the parent.  Wait for the child
         to terminate. */
-
+	printf("Stopping the daemon of verifying...\n");
 	waitpid(child_pid, &r,0);
-	printf("Daemon stopped sucefully!");
+	printf("Daemon stopped sucefully!\n\n");
   }
 
   	char * dblocale = (char * ) malloc(256);
@@ -352,15 +351,15 @@ int main(void)
 				child_pid = fork();
 				if(child_pid == 0) {
 					/* This is done by the child process. */
-					printf("Starting the daemon of verifying");
 					char *arguments2[] = { "service", "digital", "start", NULL };
 					execvp(command, arguments2);	
 
 				}else {
 					/* This is run by the parent.  Wait for the child
 					to terminate. */
+					printf("Starting the daemon of verifying...\n");
 					waitpid(child_pid, &r,0);
-					printf("Daemon started sucefully!");
+					printf("Daemon started sucefully!\n\n");
 				}
 
 				printf("Bye!\n");
