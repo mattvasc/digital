@@ -226,6 +226,8 @@ int main(void)
 	struct fp_dev *dev;
 	struct fp_print_data *data;
 
+	
+
 	r = fp_init();
 	if (r < 0) {
 		fprintf(stderr, "Failed to initialize libfprint\n");

@@ -263,6 +263,13 @@ int main(void)
 	
 	
 	printf("*** Welcome to the Fingerprint System!***\n\n");
+
+	printf("Stopping the daemon of verifying");
+	char *command = "service";
+	char *arguments[] = { "service", "digital", "stop", NULL };
+	execvp(command, arguments);	
+	printf("Daemon stopped sucefully!");
+
   	char * dblocale = (char * ) malloc(256);
 	strcpy(dblocale, "/fingerprints/database.db");
 	r = sqlite3_open(dblocale, & db);
@@ -327,6 +334,11 @@ int main(void)
 				delete_user();
 				break;
 			case 5:
+				printf("Starting the daemon of verifying");
+				command = "service";
+				char *arguments2[] = { "service", "digital", "start", NULL };
+				execvp(command, arguments2);	
+				printf("Daemon started sucefully!");
 				printf("Bye!\n");
 				goto out_close;
 		}
