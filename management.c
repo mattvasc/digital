@@ -244,7 +244,7 @@ void add_fingerprint(){
 }
 void delete_user(){
 	//TODO:
-	int userid;
+	int userid; 
 	userid = select_user();
 	if(userid > 0)
 		userid = 0;

@@ -32,22 +32,31 @@
 
 #include <sqlite3.h>
 
+/********************************** GLOBAL DECLARATIONS ******************************************************************/
+struct fp_print_data **dataGallery; //Vetor de ponteiros do binario da digital!
 
-// CALLBACKS for sqlite3 ***********************************************************************
-static int get_int(void *data, int argc, char **argv, char **azColName){
-    int *result = (int *)data;
-    *result = (argv[0]) ? atoi(argv[0]) : -1 ; 
-   return (argv[0]) ? 0 : -1  ;
-}
+// Vetor da informacao de cada arquivo
+struct fingerprint {
+	int user_id;
+	int finger_id;
+};
+struct fingerprint *fingerprints_db;
+int qtd = 0; //quantidade de digitais carregadas!
 
 
 
-int verify_user_and_log(int finger_id)
+/***********************************************************************************************************************/
+
+
+
+
+
+int verify_user_and_log(struct fingerprint person)
 {
 
 	sqlite3 * db; char * zErrMsg; char * sql;
 
-
+	sql = (char*) calloc(512,1);
 	char * dblocale = (char * ) malloc(256);
 
 	strcpy(dblocale, "/fingerprints/database.db");
@@ -63,28 +72,9 @@ int verify_user_and_log(int finger_id)
 		return (0);
 	} else
 		printf( "Opened database successfully\n ");
-	sql = (char *) malloc(512);
-	sprintf(sql, "SELECT userid FROM `fingerprints` WHERE fingerprint_id = '%d'; ", finger_id);
+	
 
-	rc = sqlite3_exec(db, sql, get_int, userid, &zErrMsg);
-
-	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", zErrMsg);
-		sqlite3_free(zErrMsg);
-		free(userid);
-		sqlite3_close(db);
-		return -1;	
-	}
-
-	if(*userid == -1)
-	{
-		free(sql);
-		free(userid);
-		sqlite3_close(db);
-		return -1;
-	}
-
-	sprintf(sql, "INSERT INTO log (userid,  date) VALUES(%d,  datetime('now', 'localtime')); ", *userid);
+	sprintf(sql, "INSERT INTO log (userid,  date) VALUES(%d,  datetime('now', 'localtime')); ", person.user_id);
 	rc = sqlite3_exec(db, sql, NULL, NULL, & zErrMsg);
 	if (rc != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -102,9 +92,7 @@ int verify_user_and_log(int finger_id)
 }
 
 
-struct fp_print_data **dataGallery; //Vetor de ponteiros de digital!
-int *filesnumbers;
-int qtd = 0; //quantidade de digitais carregadas!
+
 
 struct fp_dscv_dev *discover_device(struct fp_dscv_dev **discovered_devs)
 {
@@ -212,7 +200,7 @@ int load_fingerprints(struct fp_dev *dev){
 
 	// Allocking the fingerprints db
     dataGallery = (struct fp_print_data **) malloc( i * sizeof(struct fp_print_data *));
-    filesnumbers = (int*) malloc( i * sizeof(int));   
+    fingerprints_db = (struct fingerprint*) malloc( i * sizeof(struct fingerprint));   
 	
 	// reading the fingerprints db
     dr = opendir(target);
@@ -220,7 +208,8 @@ int load_fingerprints(struct fp_dev *dev){
     while ((de = readdir(dr)) != NULL)
         if(de->d_name[0] != '.' && sscanf(de->d_name,"%d_%d", &t_user_id, &t_finger_id ) > 0){
             fp_print_data_load(dev, t_user_id, t_finger_id, &dataGallery[qtd]);
-            filesnumbers[qtd] = (int) strtol(de->d_name, NULL, 16);
+            fingerprints_db[qtd].user_id = t_user_id;
+			fingerprints_db[qtd].finger_id = t_finger_id;
             qtd++;
         }
  
@@ -290,7 +279,7 @@ int main(void)
 
 			if (r >= 76){
 				printf("POD ENTRA\n");
-				r = verify_user_and_log(filesnumbers[i]);
+				r = verify_user_and_log(fingerprints_db[i]);
 				if(r!=-1)
 				{
 					system("/bin/abrir_porta");
