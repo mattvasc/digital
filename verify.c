@@ -181,7 +181,7 @@ struct fp_print_data *enroll(struct fp_dev *dev) {
 int load_fingerprints(struct fp_dev *dev){
 	//struct passwd *pw = getpwuid(getuid());
     //const char *homedir = pw->pw_dir;
-    char target[512];
+    char target[32];
    // strcpy(target,homedir);
     strcpy(target, "/fingerprints/");
     int i = 0;
@@ -193,7 +193,7 @@ int load_fingerprints(struct fp_dev *dev){
 
     //Reseta quantidade de digital
     qtd = 0;
- printf("%s\n", target);
+
     if (dr == NULL)  // opendir returns NULL if couldn't open directory
     {
         printf("Could not open current directory" );
@@ -202,16 +202,24 @@ int load_fingerprints(struct fp_dev *dev){
  
     // Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html
     // for readdir()
+
+	// Counting how many files are in the folder
     while ((de = readdir(dr)) != NULL)
     	i++;
 
+	// subtracting the '.' and '..' "files"
     i-=2;
+
+	// Allocking the fingerprints db
     dataGallery = (struct fp_print_data **) malloc( i * sizeof(struct fp_print_data *));
     filesnumbers = (int*) malloc( i * sizeof(int));   
+	
+	// reading the fingerprints db
     dr = opendir(target);
+	int t_user_id, t_finger_id;
     while ((de = readdir(dr)) != NULL)
-        if(de->d_name[0] != '.' && strlen(de->d_name) == 3){
-            fp_print_data_load(dev, (int) strtol(de->d_name, NULL, 16), &dataGallery[qtd]);
+        if(de->d_name[0] != '.' && sscanf(de->d_name,"%d_%d", &t_user_id, &t_finger_id ) > 0){
+            fp_print_data_load(dev, t_user_id, t_finger_id, &dataGallery[qtd]);
             filesnumbers[qtd] = (int) strtol(de->d_name, NULL, 16);
             qtd++;
         }
