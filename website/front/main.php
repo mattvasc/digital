@@ -6,7 +6,7 @@
 		header("Location: /");
     die();
 	}
-		
+
 ?>
 
 
@@ -23,7 +23,6 @@
   <!--Modal de notificação  -->
 	<div id="aviso_modal" class="modal fade" role="dialog" tabindex="-1">
 		<div class="modal-dialog">
-			<!-- Modal content-->
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title">Aviso</h4>
@@ -52,7 +51,7 @@
 					<div class="form-group">
 						<label class="col-md-4 control-label" for="mnome">Nome:</label>  
 						<div class="col-md-4">
-							<input id="mnome"  placeholder="Insira o Nome aqui..." class="form-control input-md" type="text">
+							<input id="mnome"  placeholder="Insira o Nome aqui..." class="form-control input-md" type="text" required>
 						</div>
 					</div>
 
@@ -60,7 +59,7 @@
 					<div class="form-group">
 					<label class="col-md-4 control-label" for="memail">Email:</label>  
 					<div class="col-md-4">
-					<input id="memail" placeholder="Insira o Email aqui..." class="form-control input-md" type="text">
+					<input id="memail" placeholder="Insira o Email aqui..." class="form-control input-md" type="email" required>
 					</div>
 					</div>
 
@@ -73,7 +72,7 @@
 				</form>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default bg-info text-white" tabindex="-1" data-dismiss="modal">Cancelar</button>
+					
 				</div>
 			</div>
 		</div>
@@ -95,8 +94,7 @@
 
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default bg-info text-white" tabindex="-1" data-dismiss="modal">Salvar</button>
-					<button type="button" class="btn btn-default bg-info text-white" tabindex="-1" data-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-default bg-info text-white" tabindex="-1" data-dismiss="modal">Fechar</button>
 				</div>
 			</div>
 		</div>
@@ -107,8 +105,9 @@
 
 
 <button class="btn btn-lg btn-primary btn-signout" onclick="logoff();">Logoff</button>
-<button class="btn btn-lg btn-primary btn-signout" onclick="irLogs();">Ver logs de acesso</button>
+<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='/logs.php';">Ver logs de acesso</button>
 <button class="btn btn-lg btn-primary btn-signout hiddenbeforeload" onclick="abrirCrud(-1);">Cadastrar novo usuário</button>
+<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='/download	.php';">Baixar Cliente</button>
 
 <style>
 .fa-delete:hover {
@@ -136,7 +135,9 @@
   <tbody>
   </tbody>
 </table>
-
+<form action="controller.php" method="POST" id="invisibleform">
+	<input type="hidden" name="action" value="logout">
+</form>
 
 <script src="src/jquery-3.3.1.min.js"></script>
 <script src="src/bootstrap.min.js"></script>
@@ -144,7 +145,7 @@
 	$(".hiddenbeforeload").hide();
 
 function logoff(){
-	alert('teste');
+	$("#invisibleform").submit();
 }
 
 function formatDate(date) {
@@ -154,46 +155,74 @@ function formatDate(date) {
     "Agosto", "Setembro", "Outubro",
     "Novembro", "Dezembro"
   ];
-
   return date.getDate() + ' de ' + monthNames[date.getMonth()] + ' de ' + date.getFullYear() + " às " + date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
 }
 
 function abrirCrud(personid){
 	if(personid == -1){
 		$("#crud_modal .modal-title").html("Cadastrar Usuário");
+		$("#mnome").val("");
+		$("#memail").val("");
+		$("#mphone").val("");
+		$("#crud_modal .modal-footer").html(
+		'<button type="button" class="btn btn-default bg-success text-white" onclick="cadastrar_usuario()">Cadastrar</button>'+
+		'<button type="button" class="btn btn-default bg-danger text-white" data-dismiss="modal">Cancelar</button>');
 	}
-
+		else{
+			$('#crud_modal .modal-title').html('Editar Usuário');
+			$("#mnome").val(($("#p"+personid + " td:nth-child(2)").html()));
+			$("#memail").val(($("#p"+personid + " td:nth-child(3)").html()));
+			$("#mphone").val( ($("#p"+personid + " td:nth-child(4)").html()!='---'?$("#p"+personid + " td:nth-child(4)").html():"" )  );
+			$("#crud_modal .modal-footer").html(
+			'<button type="button" class="btn btn-default bg-success text-white" onclick="alterar_usuario()">Alterar</button>'+
+			'<button type="button" class="btn btn-default bg-danger text-white" data-dismiss="modal">Cancelar</button>');
+		}
+		$('#crud_modal').modal('show');
 }
-
-
-$('#finger_modal').on('show.bs.modal', function(event) {
-        var row = $(event.relatedTarget).closest('tr');
-				console.log(row);
-				
-});
-
-$('#crud_modal').on('show.bs.modal', function(event) {
-        var row = $(event.relatedTarget).closest('tr');
-				console.log(row);
-				console.log(event);
-});
-
-$('#delete_modal').on('show.bs.modal', function(event) {
-        var row = $(event.relatedTarget).closest('tr');
-				console.log(row);
-});
 
 function abrirFinger(personid){
 	$("#finger_modal").modal("show");
 }
 
 function abrirDelete(personid){
-	$("#aviso_modal .modal-body").html("Tem certeza que gostaria de remover o acesso de ciclano ao laboratório? <i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\" style=\"color:red\"></i>");
+	console.log(personid);
+	$("#aviso_modal .modal-body").html("Tem certeza que gostaria de remover o acesso de "+ $("#p"+personid + " td:nth-child(2)").html() +" ao laboratório? <i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\" style=\"color:red\"></i>");
+	$("#aviso_modal .modal-footer").html(
+		'<button type="button" class="btn btn-default bg-success text-white" onclick="alert(\'OH NO! Falta desenvolver essa opção...\');">Sim, mande embora</button>'+
+		'<button type="button" class="btn btn-default bg-danger text-white" data-dismiss="modal">Não</button>'
+	);
 	$("#aviso_modal").modal("show");
+	
 }
 
-function irLogs(){
-	alert("TEM QUE IMPLEMENTAR!");
+function cadastrar_usuario(){
+	if($("#mnome").val() == "" || $("#memail").val() == ""){
+		alert("Preencha o nome e o email!");
+		return;
+	}
+
+	var dados = {"action": "insert", 'name': $("#mnome").val(), "email": $("#memail").val() , "phone": $("#mphone").val() };
+
+	$.ajax({
+      type: "POST",
+      url: "controller.php",
+      data: dados,
+			dataType: "json",
+      success: function (data) {
+				if(data && !data.error){
+					alert("Inserido com sucesso! Cadastre agora digitais.");
+					location.reload();
+				}else{
+					console.log(data.error_debug);
+					alert("Erro ao inserir fulano!");
+				}
+
+			},
+			error: function(reason){
+				alert("Erro ao tentar contactar servidor!");
+				console.log(reason);
+			}
+	});
 }
 
 $( document ).ready(function() {
@@ -207,11 +236,11 @@ $( document ).ready(function() {
 				if (data && !data.error) {
 					$(".hiddenbeforeload").show();
 					data.data.forEach(function(pessoa){
-							$("#maintable tbody").append("<tr><th scope='row'>"+i+++"</th><td>"+pessoa["name"]+"</td><td>"+pessoa["email"]+"</td><td>"+ 
+							$("#maintable tbody").append("<tr id='p"+pessoa['id']+"'><th scope='row'>"+i+++"</th><td>"+pessoa["name"]+"</td><td><a href='mailto:"+pessoa["email"]+"'>"+pessoa["email"]+"</a></td><td>"+ 
 							((pessoa["phone"]=="") ? "---" : pessoa["phone"]) + "</td><td>"+((pessoa["date"]==null) ?"---": formatDate(new Date(pessoa["date"])))+
-							"</td>"+'<td onclick="$(\'#crud_modal .modal-title\').html(\'Editar Usuário\');	$(\'#crud_modal\').modal(\'show\');" align="center"><i style="cursor:pointer"class="fas fa-lapis fa-pencil-alt"></i> </td> '+
-							 '<td align="center"><i onclick="abrirFinger(0);" style="cursor:pointer"class="fas fa-dedo fa-fingerprint"></i></td>'+
-							 '<td align="center"><i style="cursor:pointer" onclick="abrirDelete(0);" class="fas fa-delete fa-times-circle"></i></td>'+"</tr>");
+							"</td>"+'<td onclick="abrirCrud('+pessoa["id"]+');" align="center"><i style="cursor:pointer"class="fas fa-lapis fa-pencil-alt"></i> </td> '+
+							 '<td align="center"><i onclick="abrirFinger('+pessoa["id"]+');" style="cursor:pointer"class="fas fa-dedo fa-fingerprint"></i></td>'+
+							 '<td align="center"><i style="cursor:pointer" onclick="abrirDelete('+pessoa["id"]+');" class="fas fa-delete fa-times-circle"></i></td>'+"</tr>");
 						});
 				}
 				else if(data && data.error){

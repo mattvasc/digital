@@ -28,37 +28,111 @@ else if(isset($_POST['email']) && isset($_POST['passwd']) && $_POST['email'] == 
     die();
 }
 
-else if($_POST['action']=='list')
+else if(isset($_POST['action']))
 {
-    try {
-    class MyDB extends SQLite3 {
-        function __construct() {
-           $this->open('database.db');
-        }
-     }
-     
-     $db = new MyDB();
-     if(!$db) {
-        $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$db->lastErrorMsg());
-     } else {
-        
-            $sql = "SELECT user.id, user.name, user.email, user.phone,  log.date FROM user LEFT JOIN log ON user.id=log.userid GROUP BY user.id ORDER BY user.name;";
-            $ret = $db->query($sql);
-            $i=0;
-            while($row = $ret->fetchArray(SQLITE3_ASSOC) ) {
-                $retorno[$i]['id'] = $row["id"];
-                $retorno[$i]['email'] = $row["email"];
-                $retorno[$i]['phone'] = $row["phone"];
-                $retorno[$i]['name'] = $row["name"];
-                $retorno[$i]["date"] = $row["date"];
-                $i++;
+    switch($_POST['action'])
+    {
+        case 'list':
+            try {
+            class MyDB extends SQLite3 {
+                function __construct() {
+                $this->open('database.db');
+                }
             }
-            $db->close();
-            $resultado = new Resultado(false,"", $retorno,"");
-     }
-    }
-    catch (Exception $e) {
-        $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$e->getMessage());
+            
+            $db = new MyDB();
+            if(!$db) {
+                $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$db->lastErrorMsg());
+            } else {
+                
+                    $sql = "SELECT user.id, user.name, user.email, user.phone,  log.date FROM user LEFT JOIN log ON user.id=log.userid GROUP BY user.id ORDER BY LOWER(user.name);";
+                    $ret = $db->query($sql);
+                    $i=0;
+                    while($row = $ret->fetchArray(SQLITE3_ASSOC) ) {
+                        $retorno[$i]['id'] = $row["id"]; $retorno[$i]['email'] = $row["email"]; $retorno[$i]['phone'] = $row["phone"]; 
+                        $retorno[$i]['name'] = $row["name"];  $retorno[$i]["date"] = $row["date"];  $i++;
+                    }
+                    $db->close();
+                    $resultado = new Resultado(false,"", $retorno,"");
+            }
+            }
+            catch (Exception $e) {
+                "SELECT user.name, log.date FROM log LEFT JOIN user ON user.id=log.userid ORDER BY log.date DESC LIMIT 50;";
+                $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$e->getMessage());
+            }
+            break;
+        case 'log':
+            try {
+                class MyDB extends SQLite3 
+                {
+                    function __construct() 
+                    {
+                        $this->open('database.db');
+                    }
+                }
+            $db = new MyDB();
+            if(!$db) {
+                $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$db->lastErrorMsg());
+            } else {              
+                    $sql = "SELECT user.name, log.date FROM log LEFT JOIN user ON user.id=log.userid ORDER BY log.date DESC LIMIT 50;";
+                    $ret = $db->query($sql);
+                    $i=0;
+                    while($row = $ret->fetchArray(SQLITE3_ASSOC) ) {
+                        $retorno[$i]['name'] = $row["name"];  $retorno[$i]["date"] = $row["date"]; $i++;
+                    }
+                    $db->close();
+                    $resultado = new Resultado(false,"", $retorno,"");
+                }
+            }
+            catch (Exception $e) {
+                $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$e->getMessage());
+            }
+            break;
+        case 'logout':
+            $_SESSION['autenticado'] = 0;
+            unset($_SESSION['autenticado']);
+            header("Location: /");
+            die();
+            break;
+        case 'insert':
+            try {
+                class MyDB extends SQLite3 
+                {
+                    function __construct() 
+                    {
+                        $this->open('database.db');
+                    }
+                }
+                $db = new MyDB();
+                if(!$db) {
+                    $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$db->lastErrorMsg());
+                } else {              
+                    $sql = "INSERT INTO user(name,email,phone) VALUES (:nome, :emaio, :telefone);";
+                    $stmt = $db->prepare($sql);
+                    if($stmt){
+                        $stmt->bindValue(":nome", $_POST["name"], SQLITE3_TEXT);
+                        $stmt->bindValue(":emaio", $_POST["email"], SQLITE3_TEXT);
+                        $stmt->bindValue(":telefone", $_POST["phone"], SQLITE3_TEXT);
+                        $result = $stmt->execute();
+                        if($result)
+                            $resultado = new Resultado(false,"",true,"");
+                        else
+                            $resultado = new Resultado(true,"Erro ao cadastrar nova pessoa",false, $db->lastErrorMsg());
+                        $db->close();
+                    }
+                    else
+                        $resultado = new Resultado(true,"Erro ao cadastrar nova pessoa",false,"Conseguiu nem criar o stmt! " + $db->lastErrorMsg());
+                    
+                }
+            }
+            catch (Exception $e) {
+                $resultado = new Resultado(true,"Erro ao conectar no banco de dados",false,$e->getMessage());
+            }
+            break;
+        case 'list_fingers':
+            
+        default:
+            $resultado = new Resultado(true,"Ação não compreendida",false,"Caiu no default do switch");
     }
 }
 echo json_encode($resultado);
