@@ -3,7 +3,7 @@
 	if(!isset($_SESSION["autenticado"]) || $_SESSION["autenticado"] != 1)
 	{
 		session_destroy();
-		header("Location: /");
+		header("Location: http://leris.sor.ufscar.br/digital");
     die();
 	}
 		
@@ -12,10 +12,10 @@
 <!doctype html>
 <html>
 <head>
-<link href="src/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="http://leris.sor.ufscar.br/digital/src/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <meta charset="utf8">
 <title> Sistema de Digital </title>
-<link rel="shortcut icon" type="image/png" href="src/32px-Fingerprint.png"/>
+<link rel="shortcut icon" type="image/png" href="http://leris.sor.ufscar.br/digital/src/32px-Fingerprint.png"/>
 </head>
 <body>
   <!--Modal de notificação  -->
@@ -36,8 +36,8 @@
 	</div>
 	<!-- fim da modal de notificação -->
 <button class="btn btn-lg btn-primary btn-signout" onclick="logoff();">Logoff</button>
-<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='/main.php';">Gerenciar Pessoas</button>
-<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='/download	.php';">Baixar Cliente</button>
+<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='http://leris.sor.ufscar.br/digital/main.php';">Gerenciar Pessoas</button>
+<button class="btn btn-lg btn-primary btn-signout" onclick="location.href='http://leris.sor.ufscar.br/digital/download	.php';">Baixar Cliente</button>
 
 <table class="table hiddenbeforeload" id="maintable">
   <thead>
@@ -52,8 +52,8 @@
 </table>
 
 
-<script src="src/jquery-3.3.1.min.js"></script>
-<script src="src/bootstrap.min.js"></script>
+<script src="http://leris.sor.ufscar.br/digital/src/jquery-3.3.1.min.js"></script>
+<script src="http://leris.sor.ufscar.br/digital/src/bootstrap.min.js"></script>
 <script>
 $(".hiddenbeforeload").hide();
 function formatDate(date) {
@@ -69,7 +69,7 @@ function formatDate(date) {
 $( document ).ready(function() {
 	$.ajax({
       type: "POST",
-      url: "controller.php",
+      url: "http://leris.sor.ufscar.br/digital/controller.php",
       data: {"action":"log" },
 			dataType: "json",
       success: function (data) {
