@@ -20,12 +20,18 @@ if( !isset($_POST) || (!isset($_POST['email']) && !isset($_POST['passwd']) && !i
     die();
 }
 
-else if(isset($_POST['email']) && isset($_POST['passwd']) && $_POST['email'] == 'email@email' && $_POST['passwd'] == '123')
-{
-    header("Location: http://leris.sor.ufscar.br/digital/main.php");
-    session_start();
-    $_SESSION['autenticado'] = 1;
-    die();
+else if(isset($_POST['email']) && isset($_POST['passwd']) ){
+    if($_POST['email'] == 'email@email' && $_POST['passwd'] == '123')
+    {
+        header("Location: http://leris.sor.ufscar.br/digital/main.php");
+        session_start();
+        $_SESSION['autenticado'] = 1;
+        die();
+    }
+    else{
+        header("Location: http://leris.sor.ufscar.br/digital?erro=1");
+        session_destroy();
+    }
 }
 
 else if(isset($_POST['action']))
