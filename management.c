@@ -193,7 +193,7 @@ int create_user() {
 	
 	printf("Going to save a new user with the user_id: %d\n", user_id);
 	
-	rc = fp_print_data_save(data, aux1, user_id);
+	rc = fp_print_data_save(data, user_id, aux1);
 		
 	if (rc < 0)
 		fprintf(stderr, "Data save failed, code %d\n", rc);
