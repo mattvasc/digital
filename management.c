@@ -184,7 +184,7 @@ int create_user()
 			{
 				fp_dev_close(dev);
 				fp_exit();
-				//printf("There was an error while enrolling the user fingerprint, the user %s will be deleted, please try to ");
+				printf("There was an error while enrolling the user fingerprint!!");
 				exit(1);
 			}
 
@@ -278,6 +278,7 @@ int main(void)
 		printf("\nError! The program must run with sudo privileges!\n\n");
 		return -1;
 	}
+
 	printf("*** Welcome to the Fingerprint System!***\n\n");
 	char *command = "service";
 
@@ -304,19 +305,24 @@ int main(void)
 	r = sqlite3_open(dblocale, &db);
 
 	free(dblocale);
+
 	if (r)
 	{
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
 		exit(1);
 	}
+
 	r = fp_init();
+
 	if (r < 0)
 	{
 		fprintf(stderr, "Failed to initialize libfprint\n");
 		exit(1);
 	}
+
 	fp_set_debug(3);
 	discovered_devs = fp_discover_devs();
+
 	if (!discovered_devs)
 	{
 		fprintf(stderr, "Could not discover devices, maybe permission issue?\n");
@@ -324,6 +330,7 @@ int main(void)
 	}
 
 	ddev = discover_device(discovered_devs);
+
 	if (!ddev)
 	{
 		fprintf(stderr, "No devices detected, aborting.\n");
@@ -332,6 +339,7 @@ int main(void)
 
 	dev = fp_dev_open(ddev);
 	fp_dscv_devs_free(discovered_devs);
+
 	if (!dev)
 	{
 		fprintf(stderr, "Could not open device.\n");
@@ -341,6 +349,7 @@ int main(void)
 	while (1)
 	{
 		printf("Please choose a option:\n");
+
 		while (1)
 		{
 			printf("1)Register a new User\n2)Register a New Finger\n3)Update an Existing User\n4)Delete a existing User\n5)Exit\nSelected Option: ");
@@ -349,6 +358,7 @@ int main(void)
 				break;
 			printf("\nDidn't understand please choose one of the following option:\n");
 		}
+
 		switch (r)
 		{
 		case 1:
@@ -368,6 +378,7 @@ int main(void)
 			break;
 		case 5:
 			child_pid = fork();
+
 			if (child_pid == 0)
 			{
 				/* This is done by the child process. */
