@@ -225,7 +225,7 @@ int select_user()
 	for (p = username; *p; p++)
 		*p = tolower(*p); //str2lower
 
-	sprintf("SELECT * FROM `user` WHERE name LIKE '%%%s%%' ORDER BY name ASC;", username);
+	sprintf(sql, "SELECT * FROM `user` WHERE name LIKE '%%%s%%' ORDER BY name ASC;", username);
 	// PASSAR COMO PARAMETRO AO CALLBACK UMA LISTA LIGADA zzzzzzzzzzz
 	rc = sqlite3_exec(db, sql, print_table, NULL, &zErrMsg);
 	if (rc != SQLITE_OK)
