@@ -1,9 +1,10 @@
 
 In a clean Ubuntu PC:
-sudo apt install fprint_demo libpixman-1-dev libpixman-1-0 libusb-1.0-0-dev libxv-dev libsqlite3-dev libc6-dev sqlite3 build-essential automake libtool
+sudo apt install fprint_demo libpixman-1-dev libpixman-1-0 libusb-1.0-0-dev libxv-dev libsqlite3-dev libc6-dev sqlite3 build-essential automake libtool libnss3-dev
 sudo add-apt-repository ppa:eugenesan/ppa
 sudo apt-get update
 sudo apt-get install glib2.0 -y
+./autogen.sh
 ./configure
 make
 make check
