@@ -250,6 +250,9 @@ int fp_print_data_load(struct fp_dev *dev, int user_id, int finger_id,
 int fp_print_data_from_dscv_print(struct fp_dscv_print *print,
 	struct fp_print_data **data);
 int fp_print_data_save(struct fp_print_data *data, int user_id, int finger_id);
+
+int fp_print_data_save_specific_dir(struct fp_print_data *data, char *dirpath,	char *path);
+
 int fp_print_data_delete(struct fp_dev *dev, int user_id, int finger_id);
 void fp_print_data_free(struct fp_print_data *data);
 size_t fp_print_data_get_data(struct fp_print_data *data, unsigned char **ret);

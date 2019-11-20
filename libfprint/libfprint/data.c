@@ -316,7 +316,7 @@ static char *get_path_to_print(struct fp_dev *dev, int user_id, int finger_id)
  * \param finger the finger that this print corresponds to
  * \returns 0 on success, non-zero on error.
  */
-API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id,	int finger_id)
+API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id, int finger_id)
 {
 	GError *err = NULL;
 	char *path;
@@ -336,7 +336,9 @@ API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id,	int
 	path = __get_path_to_print(data->driver_id, data->devtype, user_id,finger_id);
     //printf("For the finger_id %d we get the following path: %s\n\n", user_id, finger_id, path);
 	dirpath = g_path_get_dirname(path);
+
 	r = g_mkdir_with_parents(dirpath, DIR_PERMS);
+	
 	if (r < 0) {
 		fp_err("couldn't create storage directory");
 		g_free(path);
@@ -359,6 +361,45 @@ API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id,	int
 
 	return 0;
 }
+
+API_EXPORTED int fp_print_data_save_specific_dir(struct fp_print_data *data, char *dirpath,	char *path)
+{
+	GError *err = NULL;
+	unsigned char *buf;
+	size_t len;
+	int r;
+
+	len = fp_print_data_get_data(data, &buf);
+
+	if (!len)
+		return -ENOMEM;
+    
+	r = g_mkdir_with_parents(dirpath, DIR_PERMS);
+	
+	if (r < 0) {
+		fp_err("couldn't create storage directory");
+		g_free(path);
+		g_free(dirpath);
+		return r;
+	}
+
+	fp_dbg("saving to %s", path);
+
+	g_file_set_contents(path, buf, len, &err);
+	
+	free(buf);
+	
+	if (err) {
+		r = err->code;
+		fp_err("save failed: %s", err->message);
+		g_error_free(err);
+		/* FIXME interpret error codes */
+		return r;
+	}
+
+	return 0;
+}
+
 
 gboolean fpi_print_data_compatible(uint16_t driver_id1, uint32_t devtype1,
 	enum fp_print_data_type type1, uint16_t driver_id2, uint32_t devtype2,
