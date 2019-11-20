@@ -199,6 +199,7 @@ int fp_verify_finger_img(struct fp_dev *dev,
 	struct fp_print_data *enrolled_print, struct fp_img **img);
 
 int verify_process(struct fp_print_data *imgdev, struct fp_print_data *imgdev2);
+
 void set_nr_enroll_stages(struct fp_dev *dev);
 
 /** \ingroup dev

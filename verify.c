@@ -199,6 +199,8 @@ int load_fingerprints(struct fp_dev *dev)
 
 	closedir(dr);
 
+	printf("Succefully loaded %d fingerprints to memory!", qtd);
+
 	return 0;
 }
 
