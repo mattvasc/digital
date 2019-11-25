@@ -285,7 +285,7 @@ static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype, int user_
 	char fingername[16];
 	memset(fingername,'\0',15);
 
-	sprintf(fingername, "%d_%d", user_id,finger_id);
+	sprintf(fingername, "%d_%d.pgm", user_id,finger_id);
     //printf("In the __get_path function, withe the driver_id: %d devtype: %d we get the following fingername: %s\n",driver_id, devtype, fingername);
 //	dirpath = "/digitais/";
 	strcpy(dirpath,"/fingerprints/");
@@ -349,6 +349,45 @@ API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id,	int
 	free(buf);
 	g_free(dirpath);
 	g_free(path);
+	if (err) {
+		r = err->code;
+		fp_err("save failed: %s", err->message);
+		g_error_free(err);
+		/* FIXME interpret error codes */
+		return r;
+	}
+
+	return 0;
+}
+
+API_EXPORTED int fp_print_data_save_dir(struct fp_print_data *data, char* dirpath, char* path)
+{
+	GError *err = NULL;
+	unsigned char *buf;
+	size_t len;
+	int r;
+
+	if (!base_store)
+		storage_setup();
+
+	fp_dbg("save %s print from driver %04x", finger_num_to_str(finger_id), data->driver_id);
+	len = fp_print_data_get_data(data, &buf);
+	if (!len)
+		return -ENOMEM;
+    
+	r = g_mkdir_with_parents(dirpath, DIR_PERMS);
+	if (r < 0) {
+		fp_err("couldn't create storage directory");
+		g_free(path);
+		g_free(dirpath);
+		return r;
+	}
+
+	fp_dbg("saving to %s", path);
+
+	g_file_set_contents(path, buf, len, &err);
+	free(buf);
+	
 	if (err) {
 		r = err->code;
 		fp_err("save failed: %s", err->message);
