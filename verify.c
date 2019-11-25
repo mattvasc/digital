@@ -1,3 +1,4 @@
+// Versão 1
 // Compile with the flags: -lfprint -l sqlite3
 // gcc verify.c -o verify -lsqlite3 -lfprint
 
@@ -14,7 +15,7 @@
 #include <sys/wait.h>
 
 /********************************** GLOBAL DECLARATIONS ******************************************************************/
-struct fp_print_data **dataGallery; //Vetor de ponteiros do binario da digital!
+struct fp_print_data **dataGallery; // Vetor de ponteiros do binario da digital!
 
 // Vetor da informacao de cada arquivo
 struct fingerprint
@@ -23,11 +24,11 @@ struct fingerprint
 	int finger_id;
 };
 struct fingerprint *fingerprints_db;
-int qtd = 0; //quantidade de digitais carregadas!
+int qtd = 0; // quantidade de digitais carregadas!
 
 /***********************************************************************************************************************/
 
-int verify_user_and_log(struct fingerprint person)
+int log_user_entrance(struct fingerprint person)
 {
 
 	sqlite3 *db;
@@ -40,7 +41,7 @@ int verify_user_and_log(struct fingerprint person)
 	strcpy(dblocale, "./database.db");
 	int rc;
 	int temp;
-	int *userid = (int *)malloc(sizeof(int));
+	int *logid = (int *)malloc(sizeof(int));
 
 	rc = sqlite3_open(dblocale, &db);
 	free(dblocale);
@@ -58,12 +59,12 @@ int verify_user_and_log(struct fingerprint person)
 	{
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
-		free(userid);
+		free(logid);
 		free(sql);
 		return -1;
 	}
-	temp = *userid;
-	free(userid);
+	temp = *logid;
+	free(logid);
 	free(sql);
 	sqlite3_close(db);
 	return temp;
@@ -87,9 +88,7 @@ struct fp_print_data *enroll(struct fp_dev *dev)
 	int r;
 
 	set_nr_enroll_stages(dev);
-	printf("You will need to successfully scan your finger %d times to "
-		   "complete the process.\n",
-		   fp_dev_get_nr_enroll_stages(dev));
+
 
 	do
 	{
@@ -150,8 +149,8 @@ struct fp_print_data *enroll(struct fp_dev *dev)
 
 int load_fingerprints(struct fp_dev *dev)
 {
-	//struct passwd *pw = getpwuid(getuid());
-	//const char *homedir = pw->pw_dir;
+	// struct passwd *pw = getpwuid(getuid());
+	// const char *homedir = pw->pw_dir;
 	char target[32];
 	// strcpy(target,homedir);
 	strcpy(target, "/fingerprints/");
@@ -162,7 +161,7 @@ int load_fingerprints(struct fp_dev *dev)
 	// opendir() returns a pointer of DIR type.
 	DIR *dr = opendir(target);
 
-	//Reseta quantidade de digital
+	// Reseta quantidade de digital
 	qtd = 0;
 
 	if (dr == NULL) // opendir returns NULL if couldn't open directory
@@ -199,6 +198,8 @@ int load_fingerprints(struct fp_dev *dev)
 
 	closedir(dr);
 
+	printf("\nSuccefully loaded %d fingerprints to memory!!\n", qtd);
+
 	return 0;
 }
 
@@ -224,7 +225,7 @@ int main(void)
 		exit(1);
 	}
 
-	fp_set_debug(3);
+	fp_set_debug(2);
 
 	discovered_devs = fp_discover_devs();
 
@@ -251,39 +252,43 @@ int main(void)
 		goto out;
 	}
 
-	printf("Opened device. Loading previously enrolled right index finger "
+	printf("Opened device. Loading previously enrolled right index fingers "
 		   "data...\n");
 
-	//Carrega digitais!
+	// Carrega digitais!
 	r = load_fingerprints(dev);
 
 	if (r != 0)
 	{
 		fprintf(stderr, "Failed to load fingerprint, error %d\n", r);
-		fprintf(stderr, "Did you remember to enroll your right index finger "
-						"first?\n");
 		goto out_close;
 	}
 
-	//Inicia leitura
+	// Inicia leitura
 	do
 	{
-		//Faz uma leitura de digital e salva em *data!
+		// Faz uma leitura de digital e salva em *data!
 		data = enroll(dev);
-		printf("Waiting for finger in leitor.\n\n");
-		if (!data)
+		
+		if (!data) 
+		{
+			printf("Error reading the finger!\n");
 			goto out_close;
+		}
 
-		//Verifica as digitais carregadas com a lida!
+		// Verifica as digitais carregadas em mem. com a lida!
 		i = 0;
 
 		while (i < qtd)
 		{
+			printf("Going to verify the %dº finger of %d\nUser_id: %d finger_id: %d\n", (i+1), qtd, fingerprints_db[i].user_id, fingerprints_db[i].finger_id);
 			r = verify_process(dataGallery[i], data);
 
+			// TODO: Parametrizar o treshold abaixo, em algum arquivo.
 			if (r >= 76)
 			{
 				printf("Access Granted!\n");
+				log_user_entrance(fingerprints_db[i]);
 				break;
 			}
 
