@@ -29,6 +29,9 @@
   "devDependencies": {
     "@types/express": "^4.17.2",
     "@types/node": "^12.12.11",
-    "@types/sqlite3": "^3.1.5"
+    "@types/sqlite3": "^3.1.5",
+    "nodemon": "^2.0.1",
+    "ts-node": "^8.5.2",
+    "typescript": "^3.7.2"
   }
 }
