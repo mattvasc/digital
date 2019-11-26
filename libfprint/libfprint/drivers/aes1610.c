@@ -733,9 +733,10 @@ static const struct aes_regwrite init[] = {
 	{ 0x82, 0x00 }
 };
 
-static const struct aes_regwrite stop_reader[] = {
-	{ 0xFF, 0x00 }
-};
+// Comentado por gerar warning de não usado.
+// static const struct aes_regwrite stop_reader[] = {
+// 	{ 0xFF, 0x00 }
+// };
 
 
 enum activate_states {
