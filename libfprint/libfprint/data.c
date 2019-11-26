@@ -53,15 +53,7 @@ static char *base_store = NULL;
 
 static void storage_setup(void)
 {
-	const char *homedir;
-
-	homedir = g_getenv("HOME");
-	if (!homedir)
-		homedir = g_get_home_dir();
-	if (!homedir)
-		return;
-
-	base_store = g_build_filename(homedir, ".fprint/prints", NULL);
+	base_store = g_build_filename("fingerprints", NULL);
 	g_mkdir_with_parents(base_store, DIR_PERMS);
 	/* FIXME handle failure */
 }
@@ -285,7 +277,7 @@ static char *__get_path_to_print(uint16_t driver_id, uint32_t devtype, int user_
 	char fingername[16];
 	memset(fingername,'\0',15);
 
-	sprintf(fingername, "%d_%d", user_id,finger_id);
+	sprintf(fingername, "%d_%d.pgm", user_id,finger_id);
     //printf("In the __get_path function, withe the driver_id: %d devtype: %d we get the following fingername: %s\n",driver_id, devtype, fingername);
 //	dirpath = "/digitais/";
 	strcpy(dirpath,"/fingerprints/");
@@ -362,15 +354,18 @@ API_EXPORTED int fp_print_data_save(struct fp_print_data *data, int user_id, int
 	return 0;
 }
 
-API_EXPORTED int fp_print_data_save_specific_dir(struct fp_print_data *data, char *dirpath,	char *path)
+API_EXPORTED int fp_print_data_save_dir(struct fp_print_data *data, char* dirpath, char* path)
 {
 	GError *err = NULL;
 	unsigned char *buf;
 	size_t len;
 	int r;
 
-	len = fp_print_data_get_data(data, &buf);
+	if (!base_store)
+		storage_setup();
 
+	len = fp_print_data_get_data(data, &buf);
+	
 	if (!len)
 		return -ENOMEM;
     
