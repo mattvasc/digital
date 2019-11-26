@@ -2,6 +2,11 @@ import express = require('express');
 import { User } from './interfaces';
 import Dao from './dao';
 
+if (!process.env.SUDO_UID) {
+    console.log("Process must run with sudo priveledges!");
+    process.exit(403);
+}
+
 const app = express();
 const port = 3000;
 
@@ -36,9 +41,9 @@ app.post('/user', (req, res) => {
     }
 
     dao.registerUser(user)
-    .then(() => res.send('ok'))
-    .catch(err => res.status(500).send(err));
-       
+        .then(() => res.send('ok'))
+        .catch(err => res.status(500).send(err));
+
 });
 
 
