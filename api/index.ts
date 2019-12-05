@@ -1,4 +1,5 @@
 import express = require('express');
+import jwt = require('jsonwebtoken');
 import { User } from './interfaces';
 import Dao from './dao';
 

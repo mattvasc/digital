@@ -1,5 +1,6 @@
 import sqlite3 = require('sqlite3');
 import { User, Fingerprint } from './interfaces';
+import CriptoHelper from './cripto_helper';
 
 export default class Dao {
     private db: sqlite3.Database;
@@ -69,5 +70,26 @@ export default class Dao {
                 resolve();
             })
         });
+    }
+
+    // TODO: test-me
+    public login(email: string, password: string): Promise<boolean> {
+        const database = this.db;
+        const hashed_password = CriptoHelper.sha512(password);
+        
+        const sql = `SELECT * FROM admin INNER JOIN user ON (admin.user_id = user.id)
+        WHERE user.email = '${email}' AND admin.password = '${hashed_password}'`;
+
+        return new Promise((resolve, reject) => {
+            database.get(sql, (err, row) => {
+                if (err)
+                    reject(err.message);
+                if(row)
+                    resolve(true);
+                else
+                    resolve(false);
+            })
+        });
+        
     }
 }
