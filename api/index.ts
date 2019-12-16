@@ -1,21 +1,31 @@
 import express = require('express');
-import jwt = require('jsonwebtoken');
-import { User } from './interfaces';
+import bodyParser = require('body-parser')
+
+
 import Dao from './dao';
+import CriptoHelper from './cripto_helper';
 
 if (!process.env.SUDO_UID) {
     console.log("Process must run with sudo priveledges!");
     process.exit(403);
 }
 
+
+
+
 const app = express();
-const port = 3000;
+
+// parse application/json
+app.use(bodyParser.json());
+
+
 
 // Reading envoriment variables:
 const dotenv = require('dotenv');
 dotenv.config();
 
-const dbpath = process.env.DBPATH || '';
+const dbpath = process.env.DB_PATH || '';
+console.log(`dbpath: ${dbpath}`);
 const dao = new Dao(dbpath);
 
 
@@ -24,65 +34,56 @@ app.get('/', (_req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/user', (_req, res) => {
-    dao.getUsers().then((rows) => {
-        res.send(rows);
-    }).catch((err) => {
-        res.status(500).send(err);
+
+
+// #region Autenticação e autorização
+app.post('/login', (req, res) => {
+    if(!req.body || !req.body.user || !req.body.pwd) {
+        console.log("Recebi um request de login com os campos:");
+        console.log(req.body);
+        return res.status(400).send({error: "Corpo ausente no login."});
+        
+    }
+    
+    dao.login(req.body.user, req.body.pwd)
+    .then((userId: number) => {
+        if(!userId) 
+            return res.status(401).send({error: 'Login inválido!'});
+
+        var token = CriptoHelper.generateJwt({id: userId});
+
+        res.header('TokenExpiresIn', '1800');
+    
+        return res.status(200).send({ token });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).send({error: err});
     });
-});
+    
 
-app.post('/user', (req, res) => {
-    let user: User;
-    user = req.body;
-
-    if (!user || !user.email || !user.name) {
-        res.status(400).send("Bad request, invalid user object");
-        return;
-    }
-
-    dao.registerUser(user)
-        .then(() => res.send('ok'))
-        .catch(err => res.status(500).send(err));
+    
 
 });
+app.post('/logout', (req, res) => {
+    res.status(200).send();
+ });
 
 
-app.get('/user/:id', (req, res) => {
+// #endregion
 
-    let userId = req.params['id'] as any;
+app.use('/user', require('./user'));
 
-    if (isNaN(userId)) {
-        res.status(400).send("Invalid ID");
-        return;
-    }
-
-
-    dao.getUserById(userId)
-        .then(row => res.send(row))
-        .catch(err => res.status(500).send(err));
-
-});
-
-
-
-app.get('/user/:id/finger', (req, res) => {
-
-    let userId = req.params.id as any;
-
-    if (isNaN(userId)) {
-        res.status(400).send("Invalid ID");
-        return;
-    }
-
-
-    dao.getFingersFromUser(userId)
-        .then(rows => res.send(rows))
-        .catch(err => res.status(500).send(err));
-});
-
-app.post('/user/:id/finger', (req, res) => {
-    // TODO:
-});
-
+// #region debug routes
+if((process.env.DEBUG || '').toLowerCase() === 'true'){
+    console.log("Criando rotas de debug");
+    app.post('/encrypt', (req, res) => {
+        const password = req.body.pwd;
+        const hashed_password = CriptoHelper.sha512(password);
+        res.status(200).send(hashed_password);
+    });
+}
+    
+// #endregion
+const port = 3000;
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

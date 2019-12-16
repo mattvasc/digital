@@ -3,20 +3,23 @@ import { User, Fingerprint } from './interfaces';
 import CriptoHelper from './cripto_helper';
 
 export default class Dao {
-    private db: sqlite3.Database;
+
+
+    private static db: sqlite3.Database;
     constructor(private dbpath: string) {
-        this.db = new sqlite3.Database(this.dbpath, (err) => {
-            if (err) {
-                console.error(err.message);
-            }
-            console.log('Connected to the database.');
-        });
+        if(!Dao.db)
+            Dao.db = new sqlite3.Database(this.dbpath, sqlite3.OPEN_READWRITE, (err) => {
+                if (err) {
+                    console.error(err.message);
+                }
+                console.log('Connected to the database.');
+            });
     };
 
 
     public getUsers(): Promise<User[]> {
         const sql = `SELECT * FROM user`;
-        const database = this.db;
+        const database = Dao.db;
         return new Promise(function (resolve, reject) {
             database.all(sql, (err, rows) => {
                 if (err)
@@ -28,11 +31,11 @@ export default class Dao {
     }
 
     public getUserById(userId: number): Promise<User> {
-        const database = this.db;
-        const sql = `SELECT * FROM user WHERE id = ${userId}`;
+        const database = Dao.db;
+        const sql = `SELECT * FROM user WHERE id = ?`;
 
         return new Promise((resolve, reject) => {
-            database.get(sql, (err, row) => {
+            database.get(sql, userId, (err, row) => {
                 if (err)
                     reject(err);
                 else
@@ -44,12 +47,12 @@ export default class Dao {
 
 
     public getFingersFromUser(userId: number): Promise<Fingerprint[]> {
-        const database = this.db;
-        const sql = `SELECT * FROM fingerprint WHERE userid = ${userId}`;
+        const database = Dao.db;
+        const sql = `SELECT * FROM fingerprint WHERE userid = ?`;
 
         return new Promise((resolve, reject) => {
 
-            database.all(sql, (err, rows) => {
+            database.all(sql, userId, (err, rows) => {
                 if (err) {
                     reject(err.message);
                 }
@@ -58,13 +61,16 @@ export default class Dao {
         });
     }
 
+    // TODO: Pass user id.
     public registerUser(user: User): Promise<any> {
         const sql = `INSERT INTO user (name, email, phone, created_at) 
         VALUES
-        (${user.name}, ${user.email}, ${user.phone}, datetime('now', 'localtime')`;
+        (?, ?, ?, ?)`;
+
+        const data = [user.name, user.email, user.phone, `datetime('now', 'localtime')`];
 
         return new Promise((resolve, reject) => {
-            this.db.exec(sql, (err) => {
+            Dao.db.run(sql, data, (err) => {
                 if (err)
                     reject(err.message);
                 resolve();
@@ -72,22 +78,21 @@ export default class Dao {
         });
     }
 
-    // TODO: test-me
-    public login(email: string, password: string): Promise<boolean> {
-        const database = this.db;
+    
+    public login(email: string, password: string): Promise<number> {
+        const database = Dao.db;
         const hashed_password = CriptoHelper.sha512(password);
-        
-        const sql = `SELECT * FROM admin INNER JOIN user ON (admin.user_id = user.id)
-        WHERE user.email = '${email}' AND admin.password = '${hashed_password}'`;
+        const sql = `SELECT user.id FROM admin INNER JOIN user ON (admin.user_id = user.id)
+        WHERE user.email = ? AND admin.password = ?`;
 
         return new Promise((resolve, reject) => {
-            database.get(sql, (err, row) => {
+            database.get(sql, [email, hashed_password], (err, row) => {
                 if (err)
                     reject(err.message);
                 if(row)
-                    resolve(true);
+                    resolve(row['id'] + 0);
                 else
-                    resolve(false);
+                    resolve(0);
             })
         });
         
