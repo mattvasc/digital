@@ -3,7 +3,10 @@ import jwt = require('jsonwebtoken');
 import crypto = require('crypto');
 import fs = require('fs');
 
+// TODO: Left create command.
 const privateKey = fs.readFileSync('jwt.key');
+
+// openssl rsa -in jwt.key -pubout -outform PEM -out jwt.pem
 const publicKey = fs.readFileSync('jwt.pem');
 
 export default class CriptoHelper {

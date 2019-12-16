@@ -2,12 +2,14 @@ import sqlite3 = require('sqlite3');
 import { User, Fingerprint } from './interfaces';
 import CriptoHelper from './cripto_helper';
 
+// https://github.com/mapbox/node-sqlite3/wiki/API
+
 export default class Dao {
 
 
     private static db: sqlite3.Database;
     constructor(private dbpath: string) {
-        if(!Dao.db)
+        if (!Dao.db)
             Dao.db = new sqlite3.Database(this.dbpath, sqlite3.OPEN_READWRITE, (err) => {
                 if (err) {
                     console.error(err.message);
@@ -78,7 +80,7 @@ export default class Dao {
         });
     }
 
-    
+
     public login(email: string, password: string): Promise<number> {
         const database = Dao.db;
         const hashed_password = CriptoHelper.sha512(password);
@@ -89,12 +91,12 @@ export default class Dao {
             database.get(sql, [email, hashed_password], (err, row) => {
                 if (err)
                     reject(err.message);
-                if(row)
+                if (row)
                     resolve(row['id'] + 0);
                 else
                     resolve(0);
             })
         });
-        
+
     }
 }
