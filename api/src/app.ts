@@ -1,6 +1,7 @@
 import express from 'express';
 
-import routes from './routes';
+import AuthRoutes from './routes/auth.route';
+import UsersRoutes from './routes/users.route';
 
 class App {
     public express: express.Application;
@@ -17,7 +18,8 @@ class App {
     }
     
     private routes(): void {
-        this.express.use(routes);
+        this.express.use('/', AuthRoutes.router);
+        this.express.use('/api/user', UsersRoutes.router);
     }
 }
 
