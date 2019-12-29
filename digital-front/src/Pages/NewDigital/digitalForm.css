@@ -11,7 +11,7 @@
     flex-direction: column;
 }
 
-.formDigital input {
+.formDigital input, .fingersList {
     padding: 1em;
 }
 
@@ -29,6 +29,7 @@
     border: none;
     background-color: #895aa1;
     color: white;
+    cursor: pointer;
 }
 
 .submitButton {

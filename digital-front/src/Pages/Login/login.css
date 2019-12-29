@@ -23,6 +23,7 @@
     border: none;
     background-color: #895aa1;
     color: white;
+    cursor: pointer;
 }
 
 .error {

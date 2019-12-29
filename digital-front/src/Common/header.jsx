@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import {logout} from './auth';
 
 class Header extends Component {
-  Redirect(page) {
+  redirect(page) {
     switch(page) {
       case 'logout':
         logout();
@@ -23,16 +23,16 @@ class Header extends Component {
   render() {
     return (
       <header className="header">
-        <div onClick={this.Redirect.bind(this)} className="logo link">LERIS</div>
+        <div onClick={this.redirect.bind(this)} className="logo link">LERIS</div>
         <nav>
           <ul className="list">
-            <li onClick={this.Redirect.bind(this, "")} className="link">Usuários</li>
+            <li onClick={this.redirect.bind(this, "")} className="link">Usuários</li>
             <li className="separator">/</li>
-            <li onClick={this.Redirect.bind(this, "cadastro")} className="link">Nova digital</li>
+            <li onClick={this.redirect.bind(this, "cadastro")} className="link">Nova digital</li>
             <li className="separator">/</li>
-            <li onClick={this.Redirect.bind(this, "registros")} className="link">Registros</li>
+            <li onClick={this.redirect.bind(this, "registros")} className="link">Registros</li>
             <li className="separator">/</li>
-            <li onClick={this.Redirect.bind(this, "logout")} className="link logout">Sair</li>
+            <li onClick={this.redirect.bind(this, "logout")} className="link logout">Sair</li>
           </ul>
         </nav>
       </header>
