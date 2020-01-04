@@ -28,46 +28,90 @@ int qtd = 0; // quantidade de digitais carregadas!
 
 /***********************************************************************************************************************/
 
+/**
+ * Função de callback parao select usado na fn log_user_entrance
+ */
+static int callback_select_fingerprint(void *data, int argc, char **argv, char **azColName)
+{
+	int *id;
+	if (argc == 1)
+	{
+		id = data;
+		*id = strtol(argv[0], NULL, 0);
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+/**
+ * Retorna:
+ * 0 em caso de erro
+ * 1 em caso de sucesso
+ */
 int log_user_entrance(struct fingerprint person)
 {
 
 	sqlite3 *db;
 	char *zErrMsg;
 	char *sql;
+	sqlite3_stmt *res;
 
 	sql = (char *)calloc(512, 1);
 	char *dblocale = (char *)malloc(256);
 
-	strcpy(dblocale, "./database.db");
+	strcpy(dblocale, "/digital/database.db");
 	int rc;
-	int temp;
-	int *logid = (int *)malloc(sizeof(int));
+
+	int fingerprint_id = 0;
 
 	rc = sqlite3_open(dblocale, &db);
 	free(dblocale);
 	if (rc)
 	{
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return (0);
+		return 0;
 	}
 	else
 		printf("Opened database successfully\n ");
 
-	sprintf(sql, "INSERT INTO log (userid,  date) VALUES(%d,  datetime('now', 'localtime')); ", person.user_id);
+	sprintf(sql, "SELECT id FROM fingerprint WHERE user_id = %d AND finger = %d; ", person.user_id, person.finger_id);
+	rc = sqlite3_exec(db, sql, callback_select_fingerprint, &fingerprint_id, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		sqlite3_close(db);
+		free(sql);
+		return 0;
+	}
+
+	if (fingerprint_id <= 0)
+		return 0;
+
+	printf("\n\nACHEI FINGERPRINT_ID: %d", fingerprint_id);
+
+	sprintf(sql, "INSERT INTO log (fingerprint_id) VALUES (%d);", fingerprint_id);
+
 	rc = sqlite3_exec(db, sql, NULL, NULL, &zErrMsg);
 	if (rc != SQLITE_OK)
 	{
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
-		free(logid);
-		free(sql);
-		return -1;
+
+		rc = 0;
 	}
-	temp = *logid;
-	free(logid);
+	else
+	{
+		rc = 1;
+	}
+
 	free(sql);
 	sqlite3_close(db);
-	return temp;
+
+	return rc;
 }
 
 struct fp_dscv_dev *discover_device(struct fp_dscv_dev **discovered_devs)
@@ -88,7 +132,6 @@ struct fp_print_data *enroll(struct fp_dev *dev)
 	int r;
 
 	set_nr_enroll_stages(dev);
-
 
 	do
 	{
@@ -269,8 +312,8 @@ int main(void)
 	{
 		// Faz uma leitura de digital e salva em *data!
 		data = enroll(dev);
-		
-		if (!data) 
+
+		if (!data)
 		{
 			printf("Error reading the finger!\n");
 			goto out_close;
@@ -281,14 +324,20 @@ int main(void)
 
 		while (i < qtd)
 		{
-			printf("Going to verify the %dº finger of %d\nUser_id: %d finger_id: %d\n", (i+1), qtd, fingerprints_db[i].user_id, fingerprints_db[i].finger_id);
+			printf("Going to verify the %dº finger of %d\nUser_id: %d finger_id: %d\n", (i + 1), qtd, fingerprints_db[i].user_id, fingerprints_db[i].finger_id);
 			r = verify_process(dataGallery[i], data);
-
+			printf("Going to analyse the result.");
 			// TODO: Parametrizar o treshold abaixo, em algum arquivo.
-			if (r >= 76)
+			if (r >= 50)
 			{
-				printf("Access Granted!\n");
-				log_user_entrance(fingerprints_db[i]);
+				if (log_user_entrance(fingerprints_db[i]))
+				{
+					printf("\n\nAbrindo fechadura!\n\n");
+				}
+				else
+				{
+					printf("Digital encontrada, porém usuário não cadastrado! Arquivo: %d_%d.pem", fingerprints_db[i].user_id, fingerprints_db[i].finger_id);
+				}
 				break;
 			}
 
@@ -297,7 +346,7 @@ int main(void)
 
 		if (i == qtd)
 		{
-			printf("Access Denied!\n");
+			printf("\n\nAccess Denied!\n\n");
 		}
 
 		fp_print_data_free(data);
