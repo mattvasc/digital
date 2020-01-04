@@ -7,7 +7,6 @@ import CriptoHelper from '../cripto_helper';
 
 
 const dbpath = process.env.DB_PATH || '';
-console.log(`dbpath: ${dbpath}`);
 const dao = new Dao(dbpath);
 
 /**

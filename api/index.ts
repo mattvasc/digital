@@ -1,6 +1,6 @@
 import express = require('express');
 import bodyParser = require('body-parser')
-
+const { exec } = require('child_process');
 
 import Dao from './dao';
 import CriptoHelper from './cripto_helper';
@@ -88,4 +88,14 @@ if ((process.env.DEBUG || '').toLowerCase() === 'true') {
 
 // #endregion
 const port = 3000;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`API listening on port ${port}!`));
+
+console.log("\nIniciando servico da digital");
+exec("service start digital", (error, stdout, stderr) => {
+    if(error) {
+        console.log("\nErro ao inicializar serviço da digital:");
+        console.log(stderr.trim());
+    }
+    else
+        console.log("Serviço da Digital Iniciado com sucesso!");
+});
