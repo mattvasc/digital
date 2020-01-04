@@ -14,8 +14,8 @@ const dao = new Dao(dbpath);
  * Retorna todos os logs do sistema
  */
 router.get('/', CriptoHelper.verifyJWT, (_req, res) => {
-	dao.getLogs().then((rows) => {
-		res.send(rows);
+	dao.getLogs().then((logs: Log[]) => {
+		res.send(logs);
 	}).catch((err) => {
 		res.status(500).send(err);
 	});
