@@ -1,5 +1,5 @@
 import sqlite3 = require('sqlite3');
-import { User, Fingerprint } from './interfaces';
+import { User, Fingerprint, Log } from './interfaces';
 import CriptoHelper from './cripto_helper';
 
 // https://github.com/mapbox/node-sqlite3/wiki/API
@@ -17,6 +17,9 @@ export default class Dao {
                 console.log('Connected to the database.');
             });
     };
+
+    // #region User's CRUD
+
 
 
     public getUsers(): Promise<User[]> {
@@ -80,6 +83,7 @@ export default class Dao {
         });
     }
 
+    // #endregion
 
     public login(email: string, password: string): Promise<number> {
         const database = Dao.db;
@@ -97,6 +101,22 @@ export default class Dao {
                     resolve(0);
             })
         });
+    }
+
+    // #region Logs
+    public getLogs(): Promise<any> {
+        const database = Dao.db;
+        const sql = `SELECT * FROM log`;
+
+        return new Promise((resolve, reject) => {
+            database.all(sql, (err, rows) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(rows || []);
+            });
+        });
 
     }
+    // #endregion
 }

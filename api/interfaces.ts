@@ -13,3 +13,11 @@ export interface Fingerprint {
     finger: number;
     recorded_at?: Date;
 }
+
+export interface Log {
+    id: number;
+    date: Date;
+    fingerprint_id: number;
+    fingerprint?: Fingerprint;
+    user?: User;
+}

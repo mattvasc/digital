@@ -72,7 +72,9 @@ app.post('/logout', (req, res) => {
 
 // #endregion
 
-app.use('/user', require('./user'));
+app.use('/user', require('./routes/user'));
+app.use('/log', require('./routes/log'));
+
 
 // #region debug routes
 if ((process.env.DEBUG || '').toLowerCase() === 'true') {
