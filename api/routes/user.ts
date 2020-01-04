@@ -109,9 +109,9 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 
 		execSync("service digital stop");
 
-		execFileSync(`/digital/enroll ${userId} ${fingerId}`)
+		execFileSync(`sleep 1 && /digital/scan ${userId} ${fingerId}`)
 
-		execSync("service digital start");
+		execSync("sleep 1 && service digital start");
 		console.log('Soltando a Lock de cadastro de usuário.');
 		lock_cadastro.unlock();
 		res.status(201).send();

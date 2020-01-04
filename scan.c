@@ -97,10 +97,30 @@ struct fp_print_data *enroll(struct fp_dev *dev)
 
 // ********************************************************************************************
 
-int main(void)
+
+
+
+int main(int argc, char* argv[])
 {
 
 	int r = 0;
+	int target_user_id = 0, target_finger_id = 11;
+
+	if(argc < 3){
+		fprintf(stderr, "Error! Wrong call.\nusage: scan {user_id} {finger_id}\n");
+		exit(1);
+	}
+
+	target_user_id = strtol(argv[1], NULL, 0);
+	target_finger_id = strtol(argv[2], NULL, 0);
+
+	if(target_finger_id > 9 || target_user_id == 0 || target_finger_id < 0)
+	{
+		fprintf(stderr, "Error! Wrong call.\nusage: scan {user_id} {finger_id}\n");
+		exit(1);
+	}
+	
+
 	struct fp_dscv_dev *ddev;
 	struct fp_dscv_dev **discovered_devs;
 
@@ -152,7 +172,11 @@ int main(void)
 		r = -1;
 	}
 
-	r = fp_print_data_save_dir(data, "/tmp", "/tmp/dedo.pgm");
+	char target_file[32];
+
+	sprintf(target_file, "/fingerprints/%d_%d.pgm", target_user_id, target_finger_id);
+
+	r = fp_print_data_save_dir(data, "/fingerprints", target_file);
 
 	if (r != 0)
 		fprintf(stderr, "Data save failed, code %d\n", r);
