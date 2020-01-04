@@ -12,7 +12,7 @@ CREATE TABLE `user` (
     `name` varchar(128) NOT NULL,
     `email` varchar(256) NOT NULL,
     `phone` varchar(64),
-    `created_at` datetime NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime')),
     `created_by_user_id` integer null,
     FOREIGN KEY (created_by_user_id) REFERENCES user(id),
     UNIQUE(email)
@@ -20,16 +20,16 @@ CREATE TABLE `user` (
 
 CREATE TABLE `log` (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `user_id` INTEGER NOT NULL,
-    `date` datetime NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    `fingerprint_id` INTEGER NOT NULL,
+    `date` DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime')),
+    FOREIGN KEY (fingerprint_id) REFERENCES fingerprint(id)
     );
 
 CREATE TABLE `fingerprint` (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `user_id` INTEGER,
     `finger` INTEGER CHECK (finger >= 0 AND finger < 10 ),
-    `recorded_at` datetime not null,
+    `recorded_at` DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime')),
     FOREIGN KEY (user_id) REFERENCES user(id)
     );
 
