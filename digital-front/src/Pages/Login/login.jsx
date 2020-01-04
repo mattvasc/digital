@@ -3,6 +3,7 @@ import './login.css';
 import Container from './container';
 import { withRouter } from 'react-router-dom';
 import { login, isAuthenticated } from "../../Common/auth";
+import axios from 'axios';
 
 class Login extends Component {
   state = {
@@ -24,10 +25,15 @@ class Login extends Component {
       }
     } else {
       try {
-        // Chamar api para pegar o token
-        login('teste123');
+        let response = await axios.post('http://localhost:2000/login', { user: user, pwd: password });
+        if (response.status !== 200) {
+          this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
+          return;
+        }
+        login(response.data.token);
         this.props.history.push('/');
       } catch (err) {
+        console.log(err.message);
         this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
       }
     }

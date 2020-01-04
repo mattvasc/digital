@@ -88,6 +88,7 @@ export default class Dao {
     public login(email: string, password: string): Promise<number> {
         const database = Dao.db;
         const hashed_password = CriptoHelper.sha512(password);
+        console.log(hashed_password);
         const sql = `SELECT user.id FROM admin INNER JOIN user ON (admin.user_id = user.id)
         WHERE user.email = ? AND admin.password = ?`;
 

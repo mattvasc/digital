@@ -6,6 +6,7 @@ import fs = require('fs');
 // TODO: Left create command.
 const privateKey = fs.readFileSync('jwt.key');
 
+// openssl genrsa -out jwt.key 2048
 // openssl rsa -in jwt.key -pubout -outform PEM -out jwt.pem
 const publicKey = fs.readFileSync('jwt.pem');
 
@@ -49,7 +50,7 @@ export default class CriptoHelper {
                                 if (err.name == 'TokenExpiredError')
                                         return res.status(403).send({ auth: false, error: 'Token expirado!' })
                                 console.log(err);
-                                return res.status(400).send({ auth: false, error: 'Failed to authenticate token.' })
+                                return res.status(403).send({ auth: false, error: 'Failed to authenticate token.' })
                         };
 
                         // se tudo estiver ok, salva no request para uso posterior

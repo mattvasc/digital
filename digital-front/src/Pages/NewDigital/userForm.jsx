@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './userForm.css';
 import 'react-table/react-table.css';
 import { withRouter } from 'react-router-dom';
+import axios from 'axios';
 
 class UserForm extends Component {
     state = {
@@ -18,9 +19,14 @@ class UserForm extends Component {
         } else {
             this.setState({ createError: "" });
         }
-        // post
-
-        this.props.history.push('/');
+        axios.post('http://localhost:2000/user', { name: this.state.name, email: this.state.email, phone: this.state.phone })
+            .then(() => {
+                this.props.history.push('/');
+            })
+            .catch(err => {
+                this.setState({ createError: "Erro ao cadastrar usuário. Por favor, tente novamente." });
+                return;
+            })
     }
 
     render() {

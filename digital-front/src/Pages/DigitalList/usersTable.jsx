@@ -5,18 +5,37 @@ import 'react-table/react-table.css';
 import DigitalForm from '../NewDigital/digitalForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import axios from 'axios';
 
 class UsersTable extends Component {
+    state = {
+        data: []
+    }
     Edit() {
     }
 
+    componentDidMount() {
+        try  {
+            axios.get(`http://localhost:2000/user`)
+                .then(res => {
+                    this.setState({ data: [] });
+                    res.data.map(user => {
+                        let newUser = {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email,
+                            phone: user.phone
+                        }
+                        this.setState({ data: [ ...this.state.data, newUser]});
+                    });
+                });
+        } 
+        catch(err) {
+            
+        }
+    }
+
     render() {
-        const data = [{
-            name: 'Giovanna',
-            fingers: '',
-            phone: '15981027197',
-            email: 'giovanna.blasco@hotmail.com'
-        }];
         const columns = [
         {
             Header: 'Nome',
@@ -53,7 +72,7 @@ class UsersTable extends Component {
         }];
         return (
             <div>
-                <ReactTable showFilters={true} data={data} columns={columns} defaultPageSize={1} showPagination={false} resizable={false}></ReactTable>
+                <ReactTable showFilters={true} data={this.state.data} columns={columns} pageSize={this.state.data.length} showPagination={false} resizable={false}></ReactTable>
             </div>
         )
     }

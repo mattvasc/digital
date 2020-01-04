@@ -5,3 +5,7 @@ verify
 website/database.db
 management
 database.db
+npm-debug.log
+api/jwt.pem
+api/jwt.key
+

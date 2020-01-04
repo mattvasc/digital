@@ -1,4 +1,5 @@
 import express = require('express');
+var cors = require('cors');
 import bodyParser = require('body-parser')
 const { exec } = require('child_process');
 
@@ -14,11 +15,14 @@ if (!process.env.SUDO_UID) {
 
 
 const app = express();
+var corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 // parse application/json
 app.use(bodyParser.json());
-
-
+app.use(cors());
 
 // Reading envoriment variables:
 const dotenv = require('dotenv');
@@ -87,7 +91,7 @@ if ((process.env.DEBUG || '').toLowerCase() === 'true') {
 }
 
 // #endregion
-const port = 3000;
+const port = 2000;
 app.listen(port, () => console.log(`API listening on port ${port}!`));
 
 console.log("\nIniciando servico da digital");
