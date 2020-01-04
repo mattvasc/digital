@@ -1,19 +1,19 @@
 import React, {Component} from 'react';
 import Header from './../../Common/header';
-import UserForm from './userForm';
+import DigitalForm from './digitalForm';
 import Container from './container';
 
-class CreateUser extends Component {
+class CreateDigital extends Component {
     render() {
         return (
             <div>
                 <Header></Header>
                 <Container>
-                    <UserForm></UserForm>
+                    <DigitalForm></DigitalForm>
                 </Container>
             </div>
         );
     }
 }
 
-export default CreateUser;
+export default CreateDigital;

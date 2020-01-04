@@ -1,89 +1,64 @@
 import React, {Component} from 'react';
-import './digitalForm.css';
-import ReactTable from 'react-table';
+import './userForm.css';
 import 'react-table/react-table.css';
 import Popup from "reactjs-popup";
 import Fingers from '../../Common/fingers';
+import Loader from 'react-loader-spinner'
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFingerprint } from '@fortawesome/free-solid-svg-icons'
 
 class DigitalForm extends Component {
     state = {
-        name: "",
-        email: "",
-        phone: "",
-        savedFingers: []
-    };
-
-    fingersOptionList() {
-        return (
-            <select className="fingersList" onChange={this.readFingers.bind(this)}>
-                <option key="" selected="true" disabled="disabled">Escolha um dedo para cadastro</option>
-                {Object.keys(Fingers).map(item => (
-                    <option value={item}>{Fingers[item]}</option>
-                ))}
-            </select>
-        );
+        savedFingers: [],
+        readFinger: false,
+        selectedFinger: {},
+        fingerPosition: "",
+        responseMessage: "",
+        open: false
     }
 
-    readFingers(finger) {
-        console.log(finger.target.value);
+    openModal() {
+        this.setState({ open: true });
     }
 
-    saveFingers() {
-
+    closeModal() {
+        this.setState({ open: false });
     }
 
-    finish() {
-        if (this.state.name === "" || (this.state.email === "" && this.state.phone === "")) {
-            console.log('Erro');
+    selectFinger(finger) {
+        var fingerIndex = parseInt(finger.target.value);
+        this.setState({ selectedFinger: { index: fingerIndex, name: finger.target[fingerIndex+1].text } });
+    }
+
+    readFingers() {
+        if (this.state.selectedFinger.index === undefined) {
+            return;
         }
-        // post
+        this.setState({ createError: "", readFinger: true, fingerPosition: "Por favor, posicione o dedo " + this.state.selectedFinger.name + " no dispositivo até que a luz pisque. Assim que piscar, retire o dedo rapidamente e repita esse mesmo procedimento mais 4 vezes."})
     }
 
     render() {
-        const columns = [{
-            accessor: 'finger'
-        }];
-
         return (
-            <div className="content">
-                <form className='formDigital'>
-                    <input
-                        type="text"
-                        placeholder="Nome"
-                        onChange={e => this.setState({ name: e.target.value })}
-                        value={this.props.name}
-                        className="nameField"
-                    />
-                    <div className="contactFields">
-                        <input
-                            type="text"
-                            placeholder="E-mail"
-                            onChange={e => this.setState({ email: e.target.value })}
-                            value={this.props.email}
-                            className="email"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Telefone (sem traço)"
-                            onChange={e => this.setState({ phone: e.target.value })}
-                            value={this.props.phone}
-                            maxLength="11"
-                            className="phone"
-                        />
+            <div>
+                <a onClick={this.openModal.bind(this)}><FontAwesomeIcon icon={faFingerprint}/></a>
+                <Popup open={this.state.open} closeOnDocumentClick={false} closeOnEscape={false} modal>
+                    <div>
+                        <div className="modalFingers">
+                            <select className="fingersList" defaultValue="default" onChange={this.selectFinger.bind(this)}>
+                                <option key="-1" value="default" disabled={true}>Escolha um dedo para cadastro</option>
+                                {Object.keys(Fingers).map(item => (
+                                    <option key={item} value={item} disabled={this.state.readFinger}>{Fingers[item]}</option>
+                                ))}
+                            </select>
+                            <button onClick={this.readFingers.bind(this)} type="button" className="button insert" disabled={this.state.readFinger}>Inserir dedo</button>
+                            <h5 className="fingerPosition">{this.state.fingerPosition}</h5>
+                            <Loader type="Rings" color="#895aa1" height={100} width={100} visible={this.state.readFinger}/>
+                            <h5>{this.state.responseMessage}</h5>
+                            <button onClick={this.closeModal.bind(this)} type="button" className={this.state.readFinger ? "hidden" : "button"}>Sair</button>
+                        </div>
                     </div>
-                    <Popup trigger={
-                        <button onClick={this.saveFingers.bind(this)} type="button" className="button">Cadastrar dedos</button>
-                    } modal closeOnDocumentClick closeOnEscape>
-                        {close => (
-                            <div className="modalFingers">
-                                {this.fingersOptionList()}
-                                <button className="button" type="button" onClick={close}>Fechar</button>
-                            </div>
-                        )}
-                    </Popup>
-                    <ReactTable className="fingerTable" showFilters={false} data={this.state.savedFingers} TheadComponent={_ => null} columns={columns} defaultPageSize={0} showPagination={false} resizable={false}></ReactTable>
-                </form>
-                <button className="button submitButton" type="submit" onClick={this.finish.bind(this)}>Concluir cadastro</button>
+                </Popup>    
             </div>
         );
     }

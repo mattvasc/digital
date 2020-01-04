@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
 }
 
 .formDigital {
@@ -15,7 +16,7 @@
     padding: 1em;
 }
 
-.contactFields input {
+.contactFields input, .fingersList {
     margin-top: 1em;
 }
 
@@ -23,13 +24,28 @@
     margin-right: 0.5em;
 }
 
+.modalFingers {
+    padding: 1.5em;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+}
+
+.modalFingers .insert, .fingersList {
+    width: 100%;
+}
+
 .button {
-    margin-top: 1em;
     padding: 1em;
     border: none;
     background-color: #895aa1;
     color: white;
     cursor: pointer;
+}
+
+.hidden {
+    display: none;
 }
 
 .submitButton {
@@ -39,7 +55,6 @@
 }
 
 .error {
-    width: 100%;
     font-size: 0.8em;
     color: #ce3030;
     text-align: center;
@@ -47,4 +62,8 @@
 
 .title {
     color: #895aa1;
+}
+
+.fingerPosition {
+    white-space: pre-wrap;
 }

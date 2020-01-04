@@ -1,29 +1,16 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
+import './usersTable.css';
 import 'react-table/react-table.css';
-import Modal from 'react-responsive-modal';
-import DigitalForm from './../NewDigital/digitalForm';
+import DigitalForm from '../NewDigital/digitalForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 class UsersTable extends Component {
-    state = {
-        open: false,
-        modalData: {}
-    };
-
-    onOpenModal = () => {
-        this.setState({ open: true });
-    };
-    
-    onCloseModal = () => {
-        this.setState({ open: false });
-    };
-
     Edit() {
-        this.onOpenModal();
     }
 
     render() {
-        const { openModal } = false;
         const data = [{
             name: 'Giovanna',
             fingers: '',
@@ -38,7 +25,8 @@ class UsersTable extends Component {
         },
         {
             Header: 'Dedos cadastrados',
-            accessor: 'fingers'
+            accessor: 'fingers',
+            className: 'center'
         },
         {
             Header: 'Telefone',
@@ -51,18 +39,21 @@ class UsersTable extends Component {
             className: 'center'
         },
         {
-            Header: 'Alterar',
-            accessor: 'change',
+            Header: 'Ações',
+            accessor: 'actions',
+            className: 'center',
             Cell: (row) => {
-                return <div onClick={this.Edit.bind(this)}><img src="user-edit-solid.svg" alt="editar usuário"/></div>
+                return (
+                    <div className="actions">
+                        <DigitalForm userId = {0}></DigitalForm>
+                        <a><FontAwesomeIcon icon={faTrash}/></a>
+                    </div>
+                )
             }
         }];
         return (
             <div>
-                <ReactTable showFilters={true} noDataText={_ => null} data={data} columns={columns} defaultPageSize={1} showPagination={false} resizable={false}></ReactTable>
-                <Modal open={openModal} onClose={this.onCloseModal.bind(this)} closeOnEsc={true}>
-                    <DigitalForm></DigitalForm>
-                </Modal>
+                <ReactTable showFilters={true} data={data} columns={columns} defaultPageSize={1} showPagination={false} resizable={false}></ReactTable>
             </div>
         )
     }
