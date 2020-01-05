@@ -5,6 +5,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 2em 0 2em;
+  height: 4rem;
 }
 
 .list {
@@ -28,6 +29,22 @@
 }
 
 .logo {
-  font-size: 1.5em;
+  font-size: 2em;
   font-weight: bold;
+}
+
+.logout {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  flex-direction: column;
+  padding: 2em;
+}
+
+.logout .button {
+  margin: 0 1em;
+}
+
+.popup-content {
+  width: 40vw;
 }

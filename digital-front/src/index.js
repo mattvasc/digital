@@ -8,16 +8,13 @@ import { getToken } from '../src/Common/auth';
 
 // Add a response interceptor
 axios.interceptors.response.use(function (response) {
-    console.log(response);
     return response;
   }, function(error) {
-    //catches if the session ended!
-    console.log('teste', error);
-    // if () {
-    //     console.log("EXPIRED TOKEN!");
-    //     localStorage.clear();
-    // }
-    return Promise.reject(error);
+    if (error.response.status === 401 || error.response.status === 403) {
+        console.log('unauthorized, logging out ...');
+        localStorage.clear();
+    }
+    return Promise.reject(error.response);
 });
 
 // Add a request interceptor
@@ -25,8 +22,11 @@ axios.interceptors.request.use(function(request) {
     request.headers['x-access-token'] = getToken();
     return request;
 }, function(error) {
-    console.log('a', error);
-    return Promise.reject(error);
+    if (error.response.status === 401 || error.response.status === 403) {
+        console.log('unauthorized, logging out ...');
+        localStorage.clear();
+    }
+    return Promise.reject(error.response);
 });
 
 ReactDOM.render(<App />, document.getElementById('root'));

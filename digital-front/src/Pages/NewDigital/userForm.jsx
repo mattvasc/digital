@@ -14,7 +14,7 @@ class UserForm extends Component {
 
     finish() {
         if (this.state.name === "" || this.state.email === "") {
-            this.setState({ createError: "Por favor, preencha pelo menos os campos de nome e email" });
+            this.setState({ createError: "Por favor, preencha os campos de nome e email para prosseguir" });
             return;
         } else {
             this.setState({ createError: "" });

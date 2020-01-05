@@ -6,33 +6,61 @@ import DigitalForm from '../NewDigital/digitalForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+import Fingers from '../../Common/fingers';
 
 class UsersTable extends Component {
     state = {
-        data: []
+        data: [],
+        completeLoad: false,
+        loadError: "",
+        noUsers: ""
     }
-    Edit() {
+
+    getFingerprints(fingerprints) {
+        let fingers = "";
+        if(fingerprints === null || fingerprints === undefined) {
+            return fingers;
+        }
+
+        fingerprints.map(fingerprint => {
+            fingers += Fingers[fingerprint] + "";
+        })
     }
 
     componentDidMount() {
-        try  {
-            axios.get(`http://localhost:2000/user`)
-                .then(res => {
-                    this.setState({ data: [] });
-                    res.data.map(user => {
-                        let newUser = {
-                            id: user.id,
-                            name: user.name,
-                            email: user.email,
-                            phone: user.phone
-                        }
-                        this.setState({ data: [ ...this.state.data, newUser]});
-                    });
+        axios.get(`http://localhost:2000/user`)
+            .then(res => {
+                this.setState({ data: [] });
+                if (res.data.length === 0) {
+                    this.setState({noUsers: "Não há nenhum usuário cadastrado"});
+                }
+                res.data.map(user => {
+                    let newUser = {
+                        id: user.id,
+                        name: user.name,
+                        fingers: this.getFingerprints(user.fingerprints),
+                        email: user.email,
+                        phone: user.phone
+                    }
+                    this.setState({ data: [ ...this.state.data, newUser]});
                 });
-        } 
-        catch(err) {
-            
-        }
+                this.setState({ completeLoad: true });
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({loadError: "Erro ao carregar os usuários"});
+            });
+    }
+
+    deleteUser(row) {
+        axios.delete(`http://localhost:2000/user`, { id: row.original.id })
+            .then(() => {
+                this.props.history.push('/');
+            })
+            .catch(err => {
+                console.log(err.message);
+            });
     }
 
     render() {
@@ -64,18 +92,20 @@ class UsersTable extends Component {
             Cell: (row) => {
                 return (
                     <div className="actions">
-                        <DigitalForm userId = {0}></DigitalForm>
-                        <a><FontAwesomeIcon icon={faTrash}/></a>
+                        <DigitalForm></DigitalForm>
+                        <a onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></a>
                     </div>
                 )
             }
         }];
         return (
             <div>
+                <h3>{this.state.noUsers}</h3>
+                <p className="error">{this.state.loadError}</p>
                 <ReactTable showFilters={true} data={this.state.data} columns={columns} pageSize={this.state.data.length} showPagination={false} resizable={false}></ReactTable>
             </div>
         )
     }
 }
 
-export default UsersTable;
+export default withRouter(UsersTable);

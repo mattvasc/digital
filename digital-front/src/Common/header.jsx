@@ -38,10 +38,12 @@ class Header extends Component {
                     <li className="link">Sair</li>
                   } modal closeOnDocumentClick closeOnEscape>
                   {close => (
-                      <div>
+                      <div className="logout">
                         <h4>Deseja realmente sair?</h4>
-                        <button className="button" type="button" onClick={this.redirect.bind(this, "logout")}>Sim</button>
-                        <button className="button" type="button" onClick={close}>Não</button>
+                        <div>
+                          <button className="button" type="button" onClick={this.redirect.bind(this, "logout")}>Sim</button>
+                          <button className="button" type="button" onClick={close}>Não</button>
+                        </div>
                       </div>
                   )}
               </Popup>

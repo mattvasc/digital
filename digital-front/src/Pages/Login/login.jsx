@@ -33,7 +33,6 @@ class Login extends Component {
         login(response.data.token);
         this.props.history.push('/');
       } catch (err) {
-        console.log(err.message);
         this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
       }
     }
@@ -49,7 +48,6 @@ class Login extends Component {
         <form onSubmit={this.handleLogin} className='formLogin'>
           <h1 className="title">LERIS</h1>
           <h3 className="subtitle">Gerenciamento de digitais</h3>
-          <p className="error">{this.state.error}</p>
           <input
             type="text"
             placeholder="Usuário"
@@ -62,6 +60,7 @@ class Login extends Component {
           />
           <button type="submit">Entrar</button>
         </form>
+        <p className="error">{this.state.error}</p>
       </Container>
     );
   }
