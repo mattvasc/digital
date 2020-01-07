@@ -37,7 +37,7 @@ router.post('/', CriptoHelper.verifyJWT, (req, res) => {
 		return;
 	}
 
-	dao.registerUser(user)
+	dao.registerUser(user, req['userId'])
 		.then(() => res.status(201).send('ok'))
 		.catch(err => res.status(500).send(err));
 

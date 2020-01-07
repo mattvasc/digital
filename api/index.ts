@@ -15,13 +15,12 @@ if (!process.env.SUDO_UID) {
 
 
 const app = express();
-var corsOptions = {
-    origin: 'http://localhost:3000',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
 
 // parse application/json
 app.use(bodyParser.json());
+
+// Se houver problemas com Cors usar o seguinte:
+// cors({credentials: true, origin: true})
 app.use(cors());
 
 // Reading envoriment variables:
