@@ -24,22 +24,25 @@ class UsersTable extends Component {
         }
 
         fingerprints.forEach(fingerprint => {
-            fingers += Fingers[fingerprint] + "";
+            fingers += Fingers[fingerprint] + " - ";
         });
+
+        return fingers.replace(/-\s*$/, "");;
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:2000/user`)
+        axios.get(process.env.REACT_APP_API_URL+`user`)
             .then(res => {
                 this.setState({ data: [] });
                 if (res.data.length === 0) {
                     this.setState({noUsers: "Não há nenhum usuário cadastrado"});
                 }
+                console.log(res.data);
                 res.data.forEach(user => {
                     let newUser = {
                         id: user.id,
                         name: user.name,
-                        fingers: this.getFingerprints(user.fingerprints),
+                        fingers: this.getFingerprints(user.finger),
                         email: user.email,
                         phone: user.phone
                     }
@@ -55,7 +58,7 @@ class UsersTable extends Component {
     }
 
     deleteUser(row) {
-        axios.delete(`http://localhost:2000/user`, { id: row.original.id })
+        axios.delete(process.env.REACT_APP_API_URL+`user`, { id: row.original.id })
             .then(() => {
                 this.props.history.push('/');
             })
@@ -69,12 +72,14 @@ class UsersTable extends Component {
         {
             Header: 'Nome',
             accessor: 'name',
-            className: 'center'
+            className: 'center',
+            style: { 'whiteSpace': 'unset' }
         },
         {
             Header: 'Dedos cadastrados',
             accessor: 'fingers',
-            className: 'center'
+            className: 'center',
+            style: { 'whiteSpace': 'unset' }
         },
         {
             Header: 'Telefone',
@@ -84,7 +89,8 @@ class UsersTable extends Component {
         {
             Header: 'Email',
             accessor: 'email',
-            className: 'center'
+            className: 'center',
+            style: { 'whiteSpace': 'unset' }
         },
         {
             Header: 'Ações',
@@ -94,7 +100,7 @@ class UsersTable extends Component {
                 return (
                     <div className="actions">
                         <DigitalForm></DigitalForm>
-                        <button title="Apagar usuário" onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
+                        <button title="Apagar usuário" className="linkButton" onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
                     </div>
                 )
             }

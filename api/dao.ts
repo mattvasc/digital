@@ -1,5 +1,5 @@
 import sqlite3 = require('sqlite3');
-import { User, Fingerprint, Log } from './interfaces';
+import { User, Fingerprint, Log, UserFingers } from './interfaces';
 import CriptoHelper from './cripto_helper';
 
 // https://github.com/mapbox/node-sqlite3/wiki/API
@@ -23,14 +23,27 @@ export default class Dao {
 
 
     public getUsers(): Promise<User[]> {
-        const sql = `SELECT * FROM user`;
+        const sql = `SELECT u.*, f.finger FROM user u LEFT JOIN fingerprint f ON u.id = f.user_id ORDER BY u.name`;
         const database = Dao.db;
         return new Promise(function (resolve, reject) {
             database.all(sql, (err, rows) => {
                 if (err)
                     reject(err);
-                else
-                    resolve(rows || []);
+                else {
+                    let finalGroup = [];
+                    resolve((rows || []).reduce((group: UserFingers[], row) => {
+                        const idx = group.findIndex(u => u.id == row.id);
+                        if(idx >= 0 && row.finger != null) {
+                            group[idx].finger?.push(row.finger);
+                        }
+                        else {
+                            row.finger = row.finger != null ? [].concat(row.finger) : [];
+                            group.push(row);
+                        }
+
+                        return group;
+                    }, finalGroup));
+                }
             });
         });
     }

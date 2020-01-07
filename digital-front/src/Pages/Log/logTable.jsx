@@ -14,7 +14,7 @@ class LogTable extends Component {
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:2000/log`)
+        axios.get(process.env.REACT_APP_API_URL+`log`)
             .then(res => {
                 this.setState({ data: [] });
                 if (res.data.length === 0) {
@@ -44,7 +44,8 @@ class LogTable extends Component {
         {
             Header: 'Nome',
             accessor: 'name',
-            className: 'center'
+            className: 'center',
+            style: { 'whiteSpace': 'unset' }
         },
         {
             Header: 'Digital utilizada',
@@ -64,7 +65,8 @@ class LogTable extends Component {
         {
             Header: 'Email',
             accessor: 'email',
-            className: 'center'
+            className: 'center',
+            style: { 'whiteSpace': 'unset' }
         }];
         return (
             <div>

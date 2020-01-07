@@ -25,7 +25,7 @@ class Login extends Component {
       }
     } else {
       try {
-        let response = await axios.post('http://localhost:2000/login', { user: user, pwd: password });
+        let response = await axios.post(process.env.REACT_APP_API_URL+`login`, { user: user, pwd: password });
         if (response.status !== 200) {
           this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
           return;
