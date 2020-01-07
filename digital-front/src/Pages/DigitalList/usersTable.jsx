@@ -23,9 +23,9 @@ class UsersTable extends Component {
             return fingers;
         }
 
-        fingerprints.map(fingerprint => {
+        fingerprints.forEach(fingerprint => {
             fingers += Fingers[fingerprint] + "";
-        })
+        });
     }
 
     componentDidMount() {
@@ -35,7 +35,7 @@ class UsersTable extends Component {
                 if (res.data.length === 0) {
                     this.setState({noUsers: "Não há nenhum usuário cadastrado"});
                 }
-                res.data.map(user => {
+                res.data.forEach(user => {
                     let newUser = {
                         id: user.id,
                         name: user.name,
@@ -45,6 +45,7 @@ class UsersTable extends Component {
                     }
                     this.setState({ data: [ ...this.state.data, newUser]});
                 });
+
                 this.setState({ completeLoad: true });
             })
             .catch(err => {
@@ -93,7 +94,7 @@ class UsersTable extends Component {
                 return (
                     <div className="actions">
                         <DigitalForm></DigitalForm>
-                        <a onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></a>
+                        <button onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
                     </div>
                 )
             }

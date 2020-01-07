@@ -20,7 +20,7 @@ class LogTable extends Component {
                 if (res.data.length === 0) {
                     this.setState({noLogs: "Não há nenhum registro"});
                 }
-                res.data.map(log => {
+                res.data.forEach(log => {
                     let newUser = {
                         id: log.user?.id,
                         name: log.user?.name,
