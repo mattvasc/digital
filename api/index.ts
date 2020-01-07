@@ -28,7 +28,7 @@ app.use(cors());
 const dotenv = require('dotenv');
 dotenv.config();
 
-const dbpath = process.env.DB_PATH || '';
+const dbpath = process.env.DBPATH || '';
 console.log(`dbpath: ${dbpath}`);
 const dao = new Dao(dbpath);
 
