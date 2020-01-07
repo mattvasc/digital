@@ -8,4 +8,5 @@ database.db
 npm-debug.log
 api/jwt.pem
 api/jwt.key
+api/jwt.pub
 
