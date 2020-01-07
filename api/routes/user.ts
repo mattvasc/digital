@@ -79,7 +79,15 @@ router.delete('/:id', CriptoHelper.verifyJWT, (req, res) => {
 		return;
 	}
 
-	res.status(500).send({error: "Não implementado"});
+	dao.removeUser(userId, req.userId)
+	.then(() => {
+		res.status(200).send();
+	})
+	.catch(err => {
+		res.status(500).send({error: err});
+	});
+
+	
 });
 
 

@@ -66,7 +66,6 @@ export default class Dao {
         });
     }
 
-    // TODO: Pass user id.
     public registerUser(user: User, adminID: number): Promise<any> {
         const sql = `INSERT INTO user (name, email, phone, created_by_user_id) 
         VALUES
@@ -79,7 +78,19 @@ export default class Dao {
                 if (err)
                     reject(err.message);
                 resolve();
-            })
+            });
+        });
+    }
+
+    public removeUser(userId: number, adminID: number): Promise<any> {
+        const sql = `UPDATE user SET deleted = 1, deleted_by_user_id = ? WHERE id = ?;`;
+        const data = [adminID, userId];
+        return new Promise((resolve, reject) => {
+            Dao.db.run(sql, data, (err) => {
+                if (err)
+                    reject(err.message);
+                resolve();
+            });
         });
     }
 
