@@ -80,12 +80,12 @@ export default class Dao {
     }
 
     // TODO: Pass user id.
-    public registerUser(user: User): Promise<any> {
-        const sql = `INSERT INTO user (name, email, phone, created_at) 
+    public registerUser(user: User, adminID: number): Promise<any> {
+        const sql = `INSERT INTO user (name, email, phone, created_by_user_id) 
         VALUES
         (?, ?, ?, ?)`;
 
-        const data = [user.name, user.email, user.phone, `datetime('now', 'localtime')`];
+        const data = [user.name, user.email, user.phone, adminID];
 
         return new Promise((resolve, reject) => {
             Dao.db.run(sql, data, (err) => {
