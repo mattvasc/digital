@@ -23,7 +23,8 @@ export default class Dao {
 
 
     public getUsers(): Promise<User[]> {
-        const sql = `SELECT u.*, f.finger FROM user u LEFT JOIN fingerprint f ON u.id = f.user_id ORDER BY u.name`;
+        const sql = `SELECT u.*, f.finger FROM user u LEFT JOIN fingerprint f ON u.id = f.user_id 
+        WHERE u.deleted = 0 ORDER BY u.name`;
         const database = Dao.db;
         return new Promise(function (resolve, reject) {
             database.all(sql, (err, rows) => {
@@ -34,7 +35,7 @@ export default class Dao {
                     resolve((rows || []).reduce((group: UserFingers[], row) => {
                         const idx = group.findIndex(u => u.id == row.id);
                         if(idx >= 0 && row.finger != null) {
-                            group[idx].finger?.push(row.finger);
+                            (group[idx].finger || []).push(row.finger);
                         }
                         else {
                             row.finger = row.finger != null ? [].concat(row.finger) : [];
