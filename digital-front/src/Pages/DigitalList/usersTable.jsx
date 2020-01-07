@@ -94,7 +94,7 @@ class UsersTable extends Component {
                 return (
                     <div className="actions">
                         <DigitalForm></DigitalForm>
-                        <button onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
+                        <button title="Apagar usuário" onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
                     </div>
                 )
             }

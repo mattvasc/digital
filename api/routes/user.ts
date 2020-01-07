@@ -63,6 +63,25 @@ router.get('/:id', CriptoHelper.verifyJWT, (req, res) => {
 
 });
 
+/**
+ * Tenta apagar um único usuário
+ */
+router.delete('/:id', CriptoHelper.verifyJWT, (req, res) => {
+	let userId = req.params['id'] as any;
+
+	if (isNaN(userId)) {
+		res.status(400).send({ error: "ID Inválido" });
+		return;
+	}
+
+	if(userId == req.userId) {
+		res.status(400).send({ error: "Não é possível apagar a sí mesmo." });
+		return;
+	}
+
+	res.status(500).send({error: "Não implementado"});
+});
+
 
 /**
  * Retorna quais dedos o usuário já possuí cadastrado.

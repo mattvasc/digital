@@ -95,7 +95,7 @@ const port = 2000;
 app.listen(port, () => console.log(`API listening on port ${port}!`));
 
 console.log("\nIniciando servico da digital");
-exec("service start digital", (error, stdout, stderr) => {
+exec("/usr/sbin/service digital start", (error, stdout, stderr) => {
     if(error) {
         console.log("\nErro ao inicializar serviço da digital:");
         console.log(stderr.trim());
