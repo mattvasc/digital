@@ -7,6 +7,10 @@ export interface User {
     created_by_user_id?: number;
 }
 
+export interface UserFingers extends User {
+    finger?: number[];
+}
+
 export interface Fingerprint {
     id?: number;
     user_id: number;

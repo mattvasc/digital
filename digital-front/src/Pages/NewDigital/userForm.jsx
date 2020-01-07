@@ -19,7 +19,7 @@ class UserForm extends Component {
         } else {
             this.setState({ createError: "" });
         }
-        axios.post('http://localhost:2000/user', { name: this.state.name, email: this.state.email, phone: this.state.phone })
+        axios.post(process.env.REACT_APP_API_URL+`user`, { name: this.state.name, email: this.state.email, phone: this.state.phone })
             .then(() => {
                 this.props.history.push('/');
             })

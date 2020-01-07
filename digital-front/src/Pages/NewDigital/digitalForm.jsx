@@ -41,7 +41,7 @@ class DigitalForm extends Component {
     render() {
         return (
             <div>
-                <button title="Cadastrar dedo" onClick={this.openModal.bind(this)}><FontAwesomeIcon icon={faFingerprint}/></button>
+                <button title="Cadastrar dedo" className="linkButton" onClick={this.openModal.bind(this)}><FontAwesomeIcon icon={faFingerprint}/></button>
                 <Popup open={this.state.open} closeOnDocumentClick={false} closeOnEscape={false} modal>
                     <div>
                         <div className="modalFingers">
