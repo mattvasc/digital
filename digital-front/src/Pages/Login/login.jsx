@@ -12,8 +12,7 @@ class Login extends Component {
     error: ""
   };
 
-  handleLogin = async e => {
-    e.preventDefault();
+  async handleLogin() {
     const { user, password } = this.state;
     if (!user || !password) {
       if (!user && !password) {
@@ -24,18 +23,26 @@ class Login extends Component {
         this.setState({ error: "Preencha a senha para continuar"});
       }
     } else {
-      try {
-        let response = await axios.post(process.env.REACT_APP_API_URL+`login`, { user: user, pwd: password });
-        if (response.status !== 200) {
-          this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
-          return;
-        }
-        login(response.data.token);
-        this.props.history.push('/');
-      } catch (err) {
-        this.setState({ error: "Houve um erro com o login. Por favor, verifique seus dados" });
-      }
+      axios.post(process.env.REACT_APP_API_URL+`login`, { user: user, pwd: password })
+        .then((response) => {
+          if (response.status !== 200) {
+            this.setState({ user: '', password: '', error: "Houve um erro com o login. Por favor, verifique seus dados" });
+            return;
+          }
+          login(response.data.token);
+          this.props.history.push('/');
+        })
+        .catch(err => {
+          this.setState({ user: '', password: '', error: "Houve um erro com o login. Por favor, verifique seus dados" });
+        })
     }
+  }
+
+  enterPressed(event) {
+    var code = event.keyCode || event.which;
+    if(code === 13) {
+        this.handleLogin();
+    } 
   }
 
   render() {
@@ -45,20 +52,24 @@ class Login extends Component {
 
     return (
       <Container>
-        <form onSubmit={this.handleLogin} className='formLogin'>
+        <form className='formLogin'>
           <h1 className="title">LERIS</h1>
           <h3 className="subtitle">Gerenciamento de digitais</h3>
           <input
             type="text"
             placeholder="Usuário"
+            value={this.state.user}
             onChange={e => this.setState({ user: e.target.value })}
+            onKeyPress={this.enterPressed.bind(this)}
           />
           <input
             type="password"
             placeholder="Senha"
+            value={this.state.password}
             onChange={e => this.setState({ password: e.target.value })}
+            onKeyPress={this.enterPressed.bind(this)}
           />
-          <button type="submit">Entrar</button>
+          <button type="button" onClick={this.handleLogin.bind(this)}>Entrar</button>
         </form>
         <p className="error">{this.state.error}</p>
       </Container>

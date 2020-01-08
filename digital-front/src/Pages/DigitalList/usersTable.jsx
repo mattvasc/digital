@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import './usersTable.css';
 import 'react-table/react-table.css';
-import DigitalForm from '../NewDigital/digitalForm';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import DigitalForm from './digitalForm';
+import DeleteModal from './deleteModal';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import Fingers from '../../Common/fingers';
@@ -53,17 +52,7 @@ class UsersTable extends Component {
             })
             .catch(err => {
                 console.log(err);
-                this.setState({loadError: "Erro ao carregar os usuários"});
-            });
-    }
-
-    deleteUser(row) {
-        axios.delete(process.env.REACT_APP_API_URL+`user`, { id: row.original.id })
-            .then(() => {
-                this.props.history.push('/');
-            })
-            .catch(err => {
-                console.log(err.message);
+                this.setState({loadError: "Erro ao carregar os usuários. Sua sessão pode ter expirado ou pode haver algum erro com o servidor."});
             });
     }
 
@@ -100,7 +89,7 @@ class UsersTable extends Component {
                 return (
                     <div className="actions">
                         <DigitalForm></DigitalForm>
-                        <button title="Apagar usuário" className="linkButton" onClick={this.deleteUser.bind(this, row)}><FontAwesomeIcon icon={faTrash}/></button>
+                        <DeleteModal id={row.original.id} name={row.original.name}></DeleteModal>
                     </div>
                 )
             }

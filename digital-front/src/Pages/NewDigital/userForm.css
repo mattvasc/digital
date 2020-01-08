@@ -67,3 +67,12 @@
 .fingerPosition {
     white-space: pre-wrap;
 }
+
+.deleteModal {
+    padding: 1em;
+    white-space: pre-wrap;
+}
+
+.logout .button, .deleteModal .button {
+    margin: 0 1em;
+}

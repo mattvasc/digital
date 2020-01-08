@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './userForm.css';
+import '../NewDigital/userForm.css';
 import 'react-table/react-table.css';
 import Popup from "reactjs-popup";
 import Fingers from '../../Common/fingers';
