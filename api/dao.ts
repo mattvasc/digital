@@ -35,7 +35,7 @@ export default class Dao {
                     resolve((rows || []).reduce((group: UserFingers[], row) => {
                         const idx = group.findIndex(u => u.id == row.id);
                         if(idx >= 0 && row.finger != null) {
-                            (group[idx].finger || []).push(row.finger);
+                            group[idx].finger?.push(row.finger);
                         }
                         else {
                             row.finger = row.finger != null ? [].concat(row.finger) : [];
