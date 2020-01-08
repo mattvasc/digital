@@ -23,7 +23,8 @@ export default class Dao {
 
 
     public getUsers(): Promise<User[]> {
-        const sql = `SELECT u.*, f.finger FROM user u LEFT JOIN fingerprint f ON u.id = f.user_id ORDER BY u.name`;
+        const sql = `SELECT u.*, f.finger FROM user u LEFT JOIN fingerprint f ON u.id = f.user_id 
+        WHERE u.deleted = 0 ORDER BY u.name`;
         const database = Dao.db;
         return new Promise(function (resolve, reject) {
             database.all(sql, (err, rows) => {
@@ -79,7 +80,6 @@ export default class Dao {
         });
     }
 
-    // TODO: Pass user id.
     public registerUser(user: User, adminID: number): Promise<any> {
         const sql = `INSERT INTO user (name, email, phone, created_by_user_id) 
         VALUES
@@ -92,7 +92,19 @@ export default class Dao {
                 if (err)
                     reject(err.message);
                 resolve();
-            })
+            });
+        });
+    }
+
+    public removeUser(userId: number, adminID: number): Promise<any> {
+        const sql = `UPDATE user SET deleted = 1, deleted_by_user_id = ? WHERE id = ?;`;
+        const data = [adminID, userId];
+        return new Promise((resolve, reject) => {
+            Dao.db.run(sql, data, (err) => {
+                if (err)
+                    reject(err.message);
+                resolve();
+            });
         });
     }
 

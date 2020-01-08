@@ -14,8 +14,10 @@ CREATE TABLE `user` (
     `phone` varchar(64),
     `created_at` DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime')),
     `created_by_user_id` integer null,
+    `deleted` integer not null DEFAULT 0 CHECK (deleted in (0,1)),
+    `deleted_by_user_id` integer null,
     FOREIGN KEY (created_by_user_id) REFERENCES user(id),
-    UNIQUE(email)
+    FOREIGN KEY (deleted_by_user_id) REFERENCES user(id)
     );
 
 CREATE TABLE `log` (
