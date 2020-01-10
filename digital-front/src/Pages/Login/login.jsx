@@ -25,6 +25,7 @@ class Login extends Component {
     } else {
       axios.post(process.env.REACT_APP_API_URL+`login`, { user: user, pwd: password })
         .then((response) => {
+          console.log(response);
           if (response.status !== 200) {
             this.setState({ user: '', password: '', error: "Houve um erro com o login. Por favor, verifique seus dados" });
             return;
@@ -33,6 +34,7 @@ class Login extends Component {
           this.props.history.push('/');
         })
         .catch(err => {
+          console.log(err);
           this.setState({ user: '', password: '', error: "Houve um erro com o login. Por favor, verifique seus dados" });
         })
     }

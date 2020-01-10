@@ -4,15 +4,20 @@ import './index.css';
 import App from './app';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
-import { getToken } from '../src/Common/auth';
+import { getToken, login } from '../src/Common/auth';
 
 // Add a response interceptor
 axios.interceptors.response.use(function (response) {
+    console.log(response.headers);
+    // if(response.headers['new-token'] !== null) {
+    //     login(response.headers['new-token']);
+    // }
     return response;
   }, function(error) {
     if (error.response.status === 401 || error.response.status === 403) {
         console.log('unauthorized, logging out ...');
         localStorage.clear();
+        window.location.replace('/');
     }
     return Promise.reject(error.response);
 });
@@ -25,6 +30,7 @@ axios.interceptors.request.use(function(request) {
     if (error.response.status === 401 || error.response.status === 403) {
         console.log('unauthorized, logging out ...');
         localStorage.clear();
+        window.location.replace('/');
     }
     return Promise.reject(error.response);
 });

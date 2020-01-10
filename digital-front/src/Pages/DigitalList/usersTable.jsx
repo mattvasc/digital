@@ -29,14 +29,13 @@ class UsersTable extends Component {
         return fingers.replace(/-\s*$/, "");;
     }
 
-    componentDidMount() {
+    loadUsers() {
         axios.get(process.env.REACT_APP_API_URL+`user`)
             .then(res => {
                 this.setState({ data: [] });
                 if (res.data.length === 0) {
                     this.setState({noUsers: "Não há nenhum usuário cadastrado"});
                 }
-                console.log(res.data);
                 res.data.forEach(user => {
                     let newUser = {
                         id: user.id,
@@ -54,6 +53,14 @@ class UsersTable extends Component {
                 console.log(err);
                 this.setState({loadError: "Erro ao carregar os usuários. Sua sessão pode ter expirado ou pode haver algum erro com o servidor."});
             });
+    }
+
+    handleRemoval = () => {
+        this.loadUsers();
+    }
+
+    componentDidMount() {
+        this.loadUsers();
     }
 
     render() {
@@ -89,7 +96,7 @@ class UsersTable extends Component {
                 return (
                     <div className="actions">
                         <DigitalForm></DigitalForm>
-                        <DeleteModal id={row.original.id} name={row.original.name}></DeleteModal>
+                        <DeleteModal id={row.original.id} name={row.original.name} onDeleteUser={this.handleRemoval}></DeleteModal>
                     </div>
                 )
             }

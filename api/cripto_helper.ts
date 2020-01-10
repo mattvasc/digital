@@ -55,9 +55,7 @@ export default class CriptoHelper {
 
                         // se tudo estiver ok, salva no request para uso posterior
                         req.userId = decoded.id;
-                        const currentTimeStamp = Math.ceil(new Date().getTime() / 1000);
-
-                        res.header('TokenExpiresIn', decoded.exp - currentTimeStamp);
+                        res.setHeader("new-token", CriptoHelper.generateJwt({ id: decoded.id }));
 
                         next();
                 });
