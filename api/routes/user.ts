@@ -153,30 +153,48 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 	// #endregion
 
 	if (lock_cadastro.tryLock()) {
+
+		let ja_terminou_execucao = false;
+
+		let callback_termino_execucao = (error) => {
+			lock_cadastro.unlock();
+			if(error) {
+				res.status(500).send({error});
+			} else {	
+				res.status(201).send();
+			}
+			ja_terminou_execucao = true;
+			console.log('Soltando a Lock de cadastro de usuário.');
+			execSync("sleep 1 && service digital start");
+			lock_cadastro.unlock();
+		};
+
 		console.log('Adquirindo a Lock de cadastro de usuário.');
 
 		execSync("service digital stop");
 
 		// Rodando o serviço de cadastro de forma assíncrona para poder matar ele caso demore muito.
-		var child = spawn('your-command', { detached: true });
+		var child = spawn('sleep 1 && /digital/scan ${userId} ${fingerId}', { detached: true });
 
 		// https://nodejs.org/api/child_process.html#child_process_class_childprocess
 
 		child.on('error', (err) => {
 			console.log(`child process close all stdio with err ${err}`);
+			callback_termino_execucao(err);
 		});
 
 		child.on('exit', (code) => {
 			console.log(`child process exited with code ${code}`);
 		});
 
-		execFileSync(`sleep 1 && /digital/scan ${userId} ${fingerId}`)
+		let timeout = setTimeout(() => {
+			if(ja_terminou_execucao)
+				return;
+			child.kill(); // sigterm
+		}, 90000); //1m30s
+		
 
-		execSync("sleep 1 && service digital start");
-		console.log('Soltando a Lock de cadastro de usuário.');
-
-		lock_cadastro.unlock();
-		res.status(201).send();
+		
 	} else {
 		console.log('Acesso concorrente para cadastrar usuário detectado');
 		res.status(400).send("Já existe uma operação de cadastro em andamento, tente novamente mais tarde!");
