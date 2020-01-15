@@ -7,12 +7,9 @@ import Dao from './dao';
 import CriptoHelper from './cripto_helper';
 
 if (!process.env.SUDO_UID) {
-    console.log("Process must run with sudo priveledges!");
+    console.log("Processo deve rodar com privilégios de super-usuário!");
     process.exit(403);
 }
-
-
-
 
 const app = express();
 
@@ -21,7 +18,10 @@ app.use(bodyParser.json());
 
 // Se houver problemas com Cors usar o seguinte:
 // cors({credentials: true, origin: true})
-app.use(cors());
+const corsOptions = {
+    exposedHeaders: 'new-token',
+};
+app.use(cors(corsOptions));
 
 // Reading envoriment variables:
 const dotenv = require('dotenv');

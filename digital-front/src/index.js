@@ -8,12 +8,11 @@ import { getToken, login } from '../src/Common/auth';
 
 // Add a response interceptor
 axios.interceptors.response.use(function (response) {
-    console.log(response.headers);
-    // if(response.headers['new-token'] !== null) {
-    //     login(response.headers['new-token']);
-    // }
+    if (response.headers['new-token'] !== undefined) {
+        login(response.headers['new-token']);
+    }
     return response;
-  }, function(error) {
+}, function (error) {
     if (error.response.status === 401 || error.response.status === 403) {
         console.log('unauthorized, logging out ...');
         localStorage.clear();
@@ -23,10 +22,10 @@ axios.interceptors.response.use(function (response) {
 });
 
 // Add a request interceptor
-axios.interceptors.request.use(function(request) {
+axios.interceptors.request.use(function (request) {
     request.headers['x-access-token'] = getToken();
     return request;
-}, function(error) {
+}, function (error) {
     if (error.response.status === 401 || error.response.status === 403) {
         console.log('unauthorized, logging out ...');
         localStorage.clear();

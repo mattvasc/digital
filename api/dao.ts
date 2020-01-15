@@ -80,7 +80,7 @@ export default class Dao {
         });
     }
 
-    public registerUser(user: User, adminID: number): Promise<any> {
+    public async registerUser(user: User, adminID: number): Promise<any> {
         const sql = `INSERT INTO user (name, email, phone, created_by_user_id) 
         VALUES
         (?, ?, ?, ?)`;

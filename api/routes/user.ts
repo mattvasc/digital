@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const locks = require('locks');
-const { execSync, execFileSync } = require('child_process');
+const { execSync, execFileSync, spawn } = require('child_process');
 
 import Dao from '../dao';
 import { User } from '../interfaces';
@@ -27,7 +27,7 @@ router.get('/', CriptoHelper.verifyJWT, (_req, res) => {
 /**
  * Cadastra um novo usuário
  */
-router.post('/', CriptoHelper.verifyJWT, (req, res) => {
+router.post('/', CriptoHelper.verifyJWT, async (req, res) => {
 
 	let user: User;
 	user = req.body;
@@ -36,11 +36,12 @@ router.post('/', CriptoHelper.verifyJWT, (req, res) => {
 		res.status(400).send({ error: "Bad request, invalid user object" });
 		return;
 	}
-
-	dao.registerUser(user, req['userId'])
-		.then(() => res.status(201).send('ok'))
-		.catch(err => res.status(500).send(err));
-
+	try {
+		await dao.registerUser(user, req['userId']);
+		res.status(201).send('ok');
+	} catch (error) {
+		res.status(500).send(error);
+	}
 });
 
 
@@ -67,27 +68,47 @@ router.get('/:id', CriptoHelper.verifyJWT, (req, res) => {
  * Tenta apagar um único usuário
  */
 router.delete('/:id', CriptoHelper.verifyJWT, (req, res) => {
-	let userId = req.params['id'] as any;
+	const userId = req.params['id'] as any;
 
 	if (isNaN(userId)) {
 		res.status(400).send({ error: "ID Inválido" });
 		return;
 	}
 
-	if(userId == req.userId) {
+	if (userId == req.userId) {
 		res.status(400).send({ error: "Não é possível apagar a sí mesmo." });
 		return;
 	}
 
 	dao.removeUser(userId, req.userId)
-	.then(() => {
-		res.status(200).send();
-	})
-	.catch(err => {
-		res.status(500).send({error: err});
-	});
+		.then(() => {
+			res.status(200).send();
+		})
+		.catch(err => {
+			res.status(500).send({ error: err });
+		});
 
-	
+
+});
+
+/**
+ * Altera a senha do usuário atual.
+ */
+router.put('/:password', CriptoHelper.verifyJWT, (req, res) => {
+	const old_pass = req.params['oldPwd'] as string;
+	const new_pass = req.params['newPwd'] as string;
+
+	if(old_pass == undefined || new_pass == undefined) {
+		res.status(400).send({error: "Provid oldPwd and newPwd"});
+		return;
+	}
+
+	if(new_pass.length < 6) {
+		res.status(400).send({error: "Password must have at least 6 digits"});
+		return;
+	}
+
+
 });
 
 
@@ -118,13 +139,13 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 	// #region Verificando Input
 	const userId = req.params.id as number;
 	const fingerId = req.params.finger_id as number;;
-	
+
 	// TODO: DRY
 	if (isNaN(userId)) {
 		res.status(400).send({ error: "Invalid User ID" });
 		return;
 	}
-	
+
 	if (isNaN(fingerId)) {
 		res.status(400).send({ error: "Invalid Finger ID" });
 		return;
@@ -136,10 +157,24 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 
 		execSync("service digital stop");
 
+		// Rodando o serviço de cadastro de forma assíncrona para poder matar ele caso demore muito.
+		var child = spawn('your-command', { detached: true });
+
+		// https://nodejs.org/api/child_process.html#child_process_class_childprocess
+
+		child.on('error', (err) => {
+			console.log(`child process close all stdio with err ${err}`);
+		});
+
+		child.on('exit', (code) => {
+			console.log(`child process exited with code ${code}`);
+		});
+
 		execFileSync(`sleep 1 && /digital/scan ${userId} ${fingerId}`)
 
 		execSync("sleep 1 && service digital start");
 		console.log('Soltando a Lock de cadastro de usuário.');
+
 		lock_cadastro.unlock();
 		res.status(201).send();
 	} else {
@@ -147,11 +182,7 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 		res.status(400).send("Já existe uma operação de cadastro em andamento, tente novamente mais tarde!");
 	}
 
-	
 
-	//
-
-	// TODO:
 });
 
 module.exports = router;
