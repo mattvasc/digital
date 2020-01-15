@@ -153,11 +153,13 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 	// #endregion
 
 	if (lock_cadastro.tryLock()) {
+		
+		console.log('Adquirindo a Lock de cadastro de usuário.');
 
 		let ja_terminou_execucao = false;
 
 		let callback_termino_execucao = (error) => {
-			lock_cadastro.unlock();
+
 			if(error) {
 				res.status(500).send({error});
 			} else {	
@@ -169,25 +171,24 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 			lock_cadastro.unlock();
 		};
 
-		console.log('Adquirindo a Lock de cadastro de usuário.');
-
 		execSync("service digital stop");
 
 		// Rodando o serviço de cadastro de forma assíncrona para poder matar ele caso demore muito.
-		var child = spawn('sleep 1 && /digital/scan ${userId} ${fingerId}', { detached: true });
+		var child = spawn(`sleep 1 && /digital/scan ${userId} ${fingerId}`, { detached: true });
 
 		// https://nodejs.org/api/child_process.html#child_process_class_childprocess
 
 		child.on('error', (err) => {
 			console.log(`child process close all stdio with err ${err}`);
-			callback_termino_execucao(err);
+			callback_termino_execucao(err || "Erro desconhecido.");
 		});
 
 		child.on('exit', (code) => {
 			console.log(`child process exited with code ${code}`);
+			callback_termino_execucao(code);
 		});
 
-		let timeout = setTimeout(() => {
+		setTimeout(() => {
 			if(ja_terminou_execucao)
 				return;
 			child.kill(); // sigterm
@@ -199,7 +200,6 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 		console.log('Acesso concorrente para cadastrar usuário detectado');
 		res.status(400).send("Já existe uma operação de cadastro em andamento, tente novamente mais tarde!");
 	}
-
 
 });
 
