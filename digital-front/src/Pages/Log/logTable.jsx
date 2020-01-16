@@ -35,7 +35,7 @@ class LogTable extends Component {
             })
             .catch(err => {
                 console.log(err.message);
-                this.setState({loadError: "Erro ao carregar os logs. Sua sessão pode ter expirado ou pode haver algum erro com o servidor."});
+                this.setState({loadError: "Erro ao carregar os logs! Sua sessão pode ter expirado ou pode haver algum problema com o servidor."});
             });
     }
 

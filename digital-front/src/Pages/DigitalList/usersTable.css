@@ -15,3 +15,10 @@
     border: none;
     cursor: pointer;
 }
+
+.cadastro {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 1em;
+}

@@ -7,6 +7,8 @@ import DeleteModal from './deleteModal';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import Fingers from '../../Common/fingers';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUserPlus } from '@fortawesome/free-solid-svg-icons'
 
 class UsersTable extends Component {
     state = {
@@ -51,12 +53,16 @@ class UsersTable extends Component {
             })
             .catch(err => {
                 console.log(err);
-                this.setState({loadError: "Erro ao carregar os usuários. Sua sessão pode ter expirado ou pode haver algum erro com o servidor."});
+                this.setState({loadError: "Erro ao carregar os usuários! Sua sessão pode ter expirado ou pode haver algum problema com o servidor."});
             });
     }
 
     handleRemoval = () => {
         this.loadUsers();
+    }
+
+    redirect(link) {
+        this.props.history.push(link);
     }
 
     componentDidMount() {
@@ -104,6 +110,9 @@ class UsersTable extends Component {
         return (
             <div>
                 <h3>{this.state.noUsers}</h3>
+                <div className="cadastro">
+                    <button type="button" className="button" onClick={this.redirect.bind(this, '/cadastro')}><FontAwesomeIcon icon={faUserPlus}/> Novo usuário</button>
+                </div>
                 <p className="error">{this.state.loadError}</p>
                 <ReactTable showFilters={true} data={this.state.data} columns={columns} pageSize={this.state.data.length} showPagination={false} resizable={false}></ReactTable>
             </div>

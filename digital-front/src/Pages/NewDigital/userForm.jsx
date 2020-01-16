@@ -24,7 +24,7 @@ class UserForm extends Component {
                 this.props.history.push('/');
             })
             .catch(err => {
-                this.setState({ name: '', email: '', phone: '', createError: "Erro ao cadastrar usuário. Por favor, tente novamente." });
+                this.setState({ name: '', email: '', phone: '', createError: "Erro ao cadastrar usuário! Sua sessão pode ter expirado ou pode haver algum problema com o servidor." });
                 return;
             })
     }
@@ -39,8 +39,8 @@ class UserForm extends Component {
     render() {
         return (
             <div className="content">
+                <h2 className="pageTitle">Cadastro de usuário</h2>
                 <form className='formDigital'>
-                    <p className="error">{this.state.createError}</p>           
                     <input
                         type="text"
                         placeholder="Nome"
@@ -70,6 +70,7 @@ class UserForm extends Component {
                     </div>
                 </form>
                 <button className="button submitButton" type="submit" onClick={this.finish.bind(this)}>Concluir cadastro</button>
+                <p className="error">{this.state.createError}</p>           
             </div>
         );
     }

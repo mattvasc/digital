@@ -6,8 +6,8 @@
 }
 
 .formDigital {
-    min-width: 20%;
-    padding: 3em;
+    min-width: 30%;
+    padding: 1em;
     display: flex;
     flex-direction: column;
 }
@@ -16,7 +16,7 @@
     padding: 1em;
 }
 
-.contactFields input, .fingersList {
+.contactFields input, .fingersList, .pageTitle {
     margin-top: 1em;
 }
 
