@@ -134,7 +134,7 @@ router.get('/:id/finger', CriptoHelper.verifyJWT, (req, res) => {
 /**
  * Salva um novo dedo para o usuário
  */
-router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
+router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, async (req, res) => {
 
 	// #region Verificando Input
 	const userId = req.params.id as number;
@@ -158,7 +158,7 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 
 		let ja_terminou_execucao = false;
 
-		let callback_termino_execucao = (error) => {
+		let callback_termino_execucao = async (error) => {
 
 			if (error) {
 				res.status(500).send({ error });
@@ -168,6 +168,7 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 			ja_terminou_execucao = true;
 			console.log('Soltando a Lock de cadastro de usuário.');
 			execSync("sleep 1 && service digital start");
+			await dao.insertFinger(userId, fingerId);
 			lock_cadastro.unlock();
 		};
 

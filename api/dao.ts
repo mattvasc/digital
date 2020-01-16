@@ -108,6 +108,20 @@ export default class Dao {
         });
     }
 
+    public async insertFinger(userId: number, fingerId: number) {
+        const sql = `INSERT INTO fingerprint (user_id, finger) VALUES (?, ?)`;
+
+        const data = [userId, fingerId];
+
+        return new Promise((resolve, reject) => {
+            Dao.db.run(sql, data, (err) => {
+                if (err)
+                    reject(err.message);
+                resolve();
+            });
+        });
+    }
+
     // #endregion
 
     public login(email: string, password: string): Promise<number> {

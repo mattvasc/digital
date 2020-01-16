@@ -32,7 +32,7 @@ export default class CriptoHelper {
                 return jwt.sign(payload, privateKey, {
                         algorithm: 'RS256',
                         expiresIn: 1800 // expires in 30min
-                    });
+                });
         }
 
         /**
