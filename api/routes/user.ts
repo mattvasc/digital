@@ -98,13 +98,13 @@ router.put('/:password', CriptoHelper.verifyJWT, (req, res) => {
 	const old_pass = req.params['oldPwd'] as string;
 	const new_pass = req.params['newPwd'] as string;
 
-	if(old_pass == undefined || new_pass == undefined) {
-		res.status(400).send({error: "Provid oldPwd and newPwd"});
+	if (old_pass == undefined || new_pass == undefined) {
+		res.status(400).send({ error: "Provid oldPwd and newPwd" });
 		return;
 	}
 
-	if(new_pass.length < 6) {
-		res.status(400).send({error: "Password must have at least 6 digits"});
+	if (new_pass.length < 6) {
+		res.status(400).send({ error: "Password must have at least 6 digits" });
 		return;
 	}
 
@@ -153,16 +153,16 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 	// #endregion
 
 	if (lock_cadastro.tryLock()) {
-		
+
 		console.log('Adquirindo a Lock de cadastro de usuário.');
 
 		let ja_terminou_execucao = false;
 
 		let callback_termino_execucao = (error) => {
 
-			if(error) {
-				res.status(500).send({error});
-			} else {	
+			if (error) {
+				res.status(500).send({ error });
+			} else {
 				res.status(201).send();
 			}
 			ja_terminou_execucao = true;
@@ -171,10 +171,10 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 			lock_cadastro.unlock();
 		};
 
-		execSync("service digital stop");
+		execSync("service digital stop && sleep 5");
 
 		// Rodando o serviço de cadastro de forma assíncrona para poder matar ele caso demore muito.
-		var child = spawn(`sleep 1 && /digital/scan ${userId} ${fingerId}`);
+		var child = spawn(`/digital/scan`, [userId, fingerId]);
 
 		// https://nodejs.org/api/child_process.html#child_process_class_childprocess
 
@@ -184,24 +184,24 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 		});
 
 		child.on('exit', (code, signal) => {
-			if(code != null) {
+			if (code != null) {
 				console.log(`child process exited with code ${code}`);
 				callback_termino_execucao(code);
 			} else {
 				console.log(`child process exited with signal ${signal}`);
 				callback_termino_execucao(signal);
 			}
-			
+
 		});
 
 		setTimeout(() => {
-			if(ja_terminou_execucao)
+			if (ja_terminou_execucao)
 				return;
 			child.kill(); // sigterm
 		}, 90000); //1m30s
-		
 
-		
+
+
 	} else {
 		console.log('Acesso concorrente para cadastrar usuário detectado');
 		res.status(400).send("Já existe uma operação de cadastro em andamento, tente novamente mais tarde!");
