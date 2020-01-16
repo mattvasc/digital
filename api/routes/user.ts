@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const locks = require('locks');
-const { execSync, execFileSync, spawn } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 import Dao from '../dao';
 import { User } from '../interfaces';
@@ -174,7 +174,7 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 		execSync("service digital stop");
 
 		// Rodando o serviço de cadastro de forma assíncrona para poder matar ele caso demore muito.
-		var child = spawn(`sleep 1 && /digital/scan ${userId} ${fingerId}`, { detached: true });
+		var child = spawn(`sleep 1 && /digital/scan ${userId} ${fingerId}`);
 
 		// https://nodejs.org/api/child_process.html#child_process_class_childprocess
 
@@ -183,9 +183,15 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, (req, res) => {
 			callback_termino_execucao(err || "Erro desconhecido.");
 		});
 
-		child.on('exit', (code) => {
-			console.log(`child process exited with code ${code}`);
-			callback_termino_execucao(code);
+		child.on('exit', (code, signal) => {
+			if(code != null) {
+				console.log(`child process exited with code ${code}`);
+				callback_termino_execucao(code);
+			} else {
+				console.log(`child process exited with signal ${signal}`);
+				callback_termino_execucao(signal);
+			}
+			
 		});
 
 		setTimeout(() => {
