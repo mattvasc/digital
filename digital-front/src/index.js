@@ -14,9 +14,11 @@ axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
     if (error.response.status === 401 || error.response.status === 403) {
-        console.log('unauthorized, logging out ...');
+        console.log('Operação não autorizada... Realizando logout.');
         localStorage.clear();
-        window.location.replace('/');
+        if (window.location.pathname !== '/login') {
+            window.location.replace('/');
+        }
     }
     return Promise.reject(error.response);
 });
@@ -27,9 +29,11 @@ axios.interceptors.request.use(function (request) {
     return request;
 }, function (error) {
     if (error.response.status === 401 || error.response.status === 403) {
-        console.log('unauthorized, logging out ...');
+        console.log('Operação não autorizada... Realizando logout.');
         localStorage.clear();
-        window.location.replace('/');
+        if (window.location.pathname !== '/login') {
+            window.location.replace('/');
+        }
     }
     return Promise.reject(error.response);
 });

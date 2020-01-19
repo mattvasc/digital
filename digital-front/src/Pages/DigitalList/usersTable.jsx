@@ -57,7 +57,7 @@ class UsersTable extends Component {
             });
     }
 
-    handleRemoval = () => {
+    handleUpdate = () => {
         this.loadUsers();
     }
 
@@ -101,18 +101,18 @@ class UsersTable extends Component {
             Cell: (row) => {
                 return (
                     <div className="actions">
-                        <DigitalForm></DigitalForm>
-                        <DeleteModal id={row.original.id} name={row.original.name} onDeleteUser={this.handleRemoval}></DeleteModal>
+                        <DigitalForm userId={row.original.id} onCreatedDigital={this.handleUpdate}></DigitalForm>
+                        <DeleteModal id={row.original.id} name={row.original.name} onDeleteUser={this.handleUpdate}></DeleteModal>
                     </div>
                 )
             }
         }];
         return (
             <div>
-                <h3>{this.state.noUsers}</h3>
                 <div className="cadastro">
                     <button type="button" className="button" onClick={this.redirect.bind(this, '/cadastro')}><FontAwesomeIcon icon={faUserPlus}/> Novo usuário</button>
                 </div>
+                <h3>{this.state.noUsers}</h3>
                 <p className="error">{this.state.loadError}</p>
                 <ReactTable showFilters={true} data={this.state.data} columns={columns} pageSize={this.state.data.length} showPagination={false} resizable={false}></ReactTable>
             </div>
