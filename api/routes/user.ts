@@ -168,7 +168,12 @@ router.post('/:id/finger/:finger_id', CriptoHelper.verifyJWT, async (req, res) =
 			ja_terminou_execucao = true;
 			console.log('Soltando a Lock de cadastro de usuário.');
 			execSync("sleep 1 && service digital start");
-			await dao.insertFinger(userId, fingerId);
+			try {
+				await dao.insertFinger(userId, fingerId);
+				
+			} catch (error) {
+				console.log("DEU ERRO AO SALVAR DADOS DO DEDO NO BANCO", error);
+			}
 			lock_cadastro.unlock();
 		};
 
