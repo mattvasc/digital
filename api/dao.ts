@@ -134,9 +134,11 @@ export default class Dao {
         let sql = "";
 
         if (updateFinger) {
+            console.log("Atualizando dedo de fulano...");
             sql = "UPDATE fingerprint SET recorded_at = date('now') WHERE user_id = ? AND finger = ?;";
 
         } else {
+            console.log("Inserindo o dedo de fulano na base de dados...");
             sql = `INSERT INTO fingerprint (user_id, finger) VALUES (?, ?)`;
         }
 
