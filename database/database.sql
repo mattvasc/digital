@@ -33,6 +33,6 @@ CREATE TABLE `fingerprint` (
     `finger` INTEGER CHECK (finger >= 0 AND finger < 10 ),
     `recorded_at` DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime')),
     FOREIGN KEY (user_id) REFERENCES user(id),
-    UNIQUE(`user_id`, `finger`) ON CONFLICT REPLACE
+    UNIQUE(`user_id`, `finger`)
     );
 

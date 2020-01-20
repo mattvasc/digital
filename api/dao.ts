@@ -108,8 +108,37 @@ export default class Dao {
         });
     }
 
-    public async insertFinger(userId: number, fingerId: number) {
-        const sql = `INSERT INTO fingerprint (user_id, finger) VALUES (?, ?)`;
+    public async verifyFingerExistence(userId: number, fingerID: number): Promise<boolean> {
+        const database = Dao.db;
+        const data = [userId, fingerID];
+        const sql = `SELECT id FROM fingerprint WHERE user_id = ? AND finger = ?`;
+
+        return new Promise((resolve, reject) => {
+
+            database.get(sql, data, (err, row) => {
+                if (err)
+                    reject(err.message);
+                if (row)
+                    resolve(true);
+                else
+                    resolve(false);
+            })
+        });
+    }
+
+    public async insertFinger(userId: number, fingerId: number): Promise<any> {
+        const updateFinger = await this.verifyFingerExistence(userId, fingerId);
+        
+        let sql = "";
+
+        if (updateFinger) {
+            sql = "UPDATE fingerprint SET recorded_at = date('now') WHERE user_id = ? AND finger = ?;";
+
+        } else {
+            sql = `INSERT INTO fingerprint (user_id, finger) VALUES (?, ?)`;
+        }
+
+       
 
         const data = [userId, fingerId];
 
@@ -121,6 +150,8 @@ export default class Dao {
             });
         });
     }
+
+    
 
     // #endregion
 
