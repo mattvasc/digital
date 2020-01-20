@@ -13,7 +13,7 @@ axios.interceptors.response.use(function (response) {
     }
     return response;
 }, function (error) {
-    if (error.response.status === 401 || error.response.status === 403) {
+    if (error.response !== undefined && (error.response.status === 401 || error.response.status === 403)) {
         console.log('Operação não autorizada... Realizando logout.');
         localStorage.clear();
         if (window.location.pathname !== '/login') {
@@ -28,7 +28,7 @@ axios.interceptors.request.use(function (request) {
     request.headers['x-access-token'] = getToken();
     return request;
 }, function (error) {
-    if (error.response.status === 401 || error.response.status === 403) {
+    if (error.response !== undefined && (error.response.status === 401 || error.response.status === 403)) {
         console.log('Operação não autorizada... Realizando logout.');
         localStorage.clear();
         if (window.location.pathname !== '/login') {

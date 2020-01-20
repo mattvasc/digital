@@ -20,7 +20,7 @@ class DigitalForm extends Component {
     }
 
     openModal() {
-        this.setState({ open: true });
+        this.setState({ responseMessage: "", fingerPosition: "", open: true });
     }
 
     closeModal() {
@@ -29,11 +29,11 @@ class DigitalForm extends Component {
 
     selectFinger(finger) {
         var fingerIndex = parseInt(finger.target.value);
-        this.setState({ selectedFinger: { index: fingerIndex, name: finger.target[fingerIndex+1].text } });
+        this.setState({ responseMessage: "", selectedFinger: { index: fingerIndex, name: finger.target[fingerIndex+1].text } });
     }
 
     handleClose() {
-        this.closeModal.bind(this);
+        this.closeModal();
         if (this.savedFingers) {
             this.props.onCreatedDigital();
         }
@@ -44,9 +44,10 @@ class DigitalForm extends Component {
             return;
         }
         this.setState({ createError: "", readFinger: true, fingerPosition: "Por favor, posicione o dedo " + this.state.selectedFinger.name + " no dispositivo até que a luz pisque. Assim que piscar, retire o dedo rapidamente e repita esse mesmo procedimento mais 4 vezes."})
-        axios.post(this.props.userId + '/finger/' + this.state.selectedFinger.value)
+        axios.post(process.env.REACT_APP_API_URL + '/user/' + this.props.userId + '/finger/' + this.state.selectedFinger.index)
             .then((res) => {
-                this.setState({ fingerPosition: "", responseMessage: "Digital do " + this.state.selectedFinger.name + " cadastrado com sucesso!", readFinger: false, savedFingers: true })
+                this.setState({ fingerPosition: "", responseMessage: "Digital do " + this.state.selectedFinger.name + " cadastrado com sucesso!", readFinger: false, savedFingers: true });
+                this.props.onCreatedDigital();
             })
             .catch((err) => {
                 this.setState({ fingerPosition: "", responseMessage: "Erro ao cadastrar digital! Por favor, tente novamente.", readFinger: false });
