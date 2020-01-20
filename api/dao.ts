@@ -116,8 +116,10 @@ export default class Dao {
         return new Promise((resolve, reject) => {
 
             database.get(sql, data, (err, row) => {
-                if (err)
+                if (err){
                     reject(err.message);
+                    console.log(err);
+                }
                 if (row)
                     resolve(true);
                 else
