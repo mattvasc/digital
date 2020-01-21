@@ -21,7 +21,6 @@ class LogTable extends Component {
                     this.setState({noLogs: "Não há nenhum registro"});
                 }
                 res.data.forEach(log => {
-                    console.log(log.date);
                     let newUser = {
                         id: log.user?.id,
                         name: log.user?.name,
