@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
-import './usersTable.css';
+import '../../Common/globalStyle.css';
 import 'react-table/react-table.css';
 import DigitalForm from './digitalForm';
 import DeleteModal from './deleteModal';

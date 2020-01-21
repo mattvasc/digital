@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import '../NewDigital/userForm.css';
+import '../../Common/globalStyle.css';
 import 'react-table/react-table.css';
 import Popup from "reactjs-popup";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"

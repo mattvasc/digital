@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './userForm.css';
+import '../../Common/globalStyle.css';
 import 'react-table/react-table.css';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
