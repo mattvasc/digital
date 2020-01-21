@@ -43,7 +43,7 @@ class DigitalForm extends Component {
         if (this.state.selectedFinger.index === undefined) {
             return;
         }
-        this.setState({ createError: "", readFinger: true, fingerPosition: "Por favor, posicione o dedo " + this.state.selectedFinger.name + " no dispositivo até que a luz pisque. Assim que piscar, retire o dedo rapidamente e repita esse mesmo procedimento mais 4 vezes."})
+        this.setState({ createError: "", readFinger: true, fingerPosition: "Por favor, aguarde a luz do dispositivo apagar. Quando acender, posicione o dedo " + this.state.selectedFinger.name + " no dispositivo até que a luz oscile. Assim que oscilar, retire o dedo de imediato. Repita esse procedimento 5 vezes consecutivas."});
         axios.post(process.env.REACT_APP_API_URL + '/user/' + this.props.userId + '/finger/' + this.state.selectedFinger.index)
             .then((res) => {
                 this.setState({ fingerPosition: "", responseMessage: "Digital do " + this.state.selectedFinger.name + " cadastrado com sucesso!", readFinger: false, savedFingers: true });
@@ -68,10 +68,10 @@ class DigitalForm extends Component {
                                     <option key={item} value={item} disabled={this.state.readFinger}>{Fingers[item]}</option>
                                 ))}
                             </select>
-                            <button onClick={this.readFingers.bind(this)} type="button" className="button insert" disabled={this.state.readFinger}>Inserir dedo</button>
+                            <button onClick={this.readFingers.bind(this)} type="button" className="button insert" disabled={this.state.readFinger}>Inserir digital</button>
                             <h5 className="fingerPosition">{this.state.fingerPosition}</h5>
                             <Loader type="Rings" color="#895aa1" height={100} width={100} visible={this.state.readFinger}/>
-                            <h5>{this.state.responseMessage}</h5>
+                            <h5 className="responseMessage">{this.state.responseMessage}</h5>
                             <button onClick={this.handleClose.bind(this)} type="button" className={this.state.readFinger ? "hidden" : "button"}>Sair</button>
                         </div>
                     </div>

@@ -21,13 +21,14 @@ class LogTable extends Component {
                     this.setState({noLogs: "Não há nenhum registro"});
                 }
                 res.data.forEach(log => {
+                    console.log(log.date);
                     let newUser = {
                         id: log.user?.id,
                         name: log.user?.name,
                         email: log.user?.email,
                         finger: log.fingerprint?.finger !== null ? Fingers[log.fingerprint.finger] : "-",
                         date: moment(log.date).format('DD/MM/YYYY'),
-                        time: moment(log.date).format('HH:MM')
+                        time: moment(log.date).format('HH:mm:ss')
                     }
                     this.setState({ data: [ ...this.state.data, newUser]});
                 });

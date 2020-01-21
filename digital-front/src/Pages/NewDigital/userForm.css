@@ -64,7 +64,7 @@
     color: #895aa1;
 }
 
-.fingerPosition {
+.fingerPosition, .responseMessage {
     white-space: pre-wrap;
 }
 
