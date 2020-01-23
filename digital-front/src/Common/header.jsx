@@ -16,7 +16,7 @@ class Header extends Component {
     return (
       <div>
         <header className="header">
-          <div onClick={this.redirect.bind(this, "/", false)} className="logo link">Digitais</div>
+          <div onClick={this.redirect.bind(this, "/", false)} className="logo link">Núcleo de Pesquisa Científica</div>
           <nav>
             <ul className="list">
               <li onClick={this.redirect.bind(this, "/", false)} className="link">Usuários</li>

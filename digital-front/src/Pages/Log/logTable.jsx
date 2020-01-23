@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import axios from 'axios';
-import * as moment from 'moment';
+import moment from 'moment';
+import 'moment-timezone';
 import Fingers from '../../Common/fingers';
 
 class LogTable extends Component {
@@ -13,10 +14,10 @@ class LogTable extends Component {
         noLogs: ""
     }
 
-    componentDidMount() {
-        axios.get(process.env.REACT_APP_API_URL+`log`)
+    loadLogs() {
+        axios.post(process.env.REACT_APP_API_URL+`log`, { date: this.props.date })
             .then(res => {
-                this.setState({ data: [] });
+                this.setState({ data: [], loadError: "", noLogs: "" });
                 if (res.data.length === 0) {
                     this.setState({noLogs: "Não há nenhum registro"});
                 }
@@ -34,9 +35,19 @@ class LogTable extends Component {
                 this.setState({ completeLoad: true });
             })
             .catch(err => {
-                console.log(err.message);
+                console.log(err);
                 this.setState({loadError: "Erro ao carregar os logs! Sua sessão pode ter expirado ou pode haver algum problema com o servidor."});
             });
+    }
+
+    componentDidMount() {
+        this.loadLogs();        
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.date !== this.props.date) {
+            this.loadLogs();
+        }
     }
 
     render() {

@@ -55,7 +55,8 @@ class Login extends Component {
     return (
       <Container>
         <form className='formLogin'>
-          <h2 className="title">Gerenciamento de digitais</h2>
+          <h1 className="title">NPC</h1>
+          <h3 className="subtitle">Gerenciamento de digitais</h3>
           <input
             type="text"
             placeholder="Usuário"

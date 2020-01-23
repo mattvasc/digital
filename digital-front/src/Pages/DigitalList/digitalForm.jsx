@@ -69,9 +69,9 @@ class DigitalForm extends Component {
                                 ))}
                             </select>
                             <button onClick={this.readFingers.bind(this)} type="button" className="button insert" disabled={this.state.readFinger}>Inserir digital</button>
-                            <h5 className="fingerPosition">{this.state.fingerPosition}</h5>
+                            <h4 className="fingerPosition">{this.state.fingerPosition}</h4>
                             <Loader type="Rings" color="#895aa1" height={100} width={100} visible={this.state.readFinger}/>
-                            <h5 className="responseMessage">{this.state.responseMessage}</h5>
+                            <h4 className="responseMessage">{this.state.responseMessage}</h4>
                             <button onClick={this.handleClose.bind(this)} type="button" className={this.state.readFinger ? "hidden" : "button"}>Sair</button>
                         </div>
                     </div>

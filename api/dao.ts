@@ -208,5 +208,36 @@ export default class Dao {
         });
 
     }
+
+    public getLogsByDate(date: string): Promise<Log[]> {
+        const database = Dao.db;
+        const sql = `SELECT l.id, l.date, f.finger, u.name, u.email, u.phone
+        FROM log l 
+        INNER JOIN fingerprint f ON l.fingerprint_id = f.id
+        INNER JOIN user u ON f.user_id = u.id WHERE date(l.date) = ? ORDER BY l.id DESC`;
+
+        return new Promise((resolve, reject) => {
+            database.all(sql, [date], (err, rows) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve((rows || []).map(row => {
+                            console.log(row);
+                            return {
+                                id: row['id'],
+                                date: row['date'],
+                                fingerprint: {
+                                    finger: row['finger'],
+                                },
+                                user: {
+                                    name: row['name'],
+                                    email: row['email'],
+                                    phone: row['phone']
+                                }
+                        } as Log;
+                    }));
+            });
+        });
+    }
     // #endregion
 }
