@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import '../../Common/globalStyle.css';
 import Container from './container';
+import Footer from './../../Common/footer';
 import { withRouter } from 'react-router-dom';
 import { login, isAuthenticated } from "../../Common/auth";
 import axios from 'axios';
@@ -53,28 +54,31 @@ class Login extends Component {
     }
 
     return (
-      <Container>
-        <form className='formLogin'>
-          <h1 className="title">NPC</h1>
-          <h3 className="subtitle">Gerenciamento de digitais</h3>
-          <input
-            type="text"
-            placeholder="Usuário"
-            value={this.state.user}
-            onChange={e => this.setState({ user: e.target.value })}
-            onKeyPress={this.enterPressed.bind(this)}
-          />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={this.state.password}
-            onChange={e => this.setState({ password: e.target.value })}
-            onKeyPress={this.enterPressed.bind(this)}
-          />
-          <button type="button" onClick={this.handleLogin.bind(this)}>Entrar</button>
-        </form>
-        <p className="error">{this.state.error}</p>
-      </Container>
+      <div>
+        <Container>
+          <form className='formLogin'>
+            <h1 className="title">NPC</h1>
+            <h3 className="subtitle">Gerenciamento de digitais</h3>
+            <input
+              type="text"
+              placeholder="Usuário"
+              value={this.state.user}
+              onChange={e => this.setState({ user: e.target.value })}
+              onKeyPress={this.enterPressed.bind(this)}
+            />
+            <input
+              type="password"
+              placeholder="Senha"
+              value={this.state.password}
+              onChange={e => this.setState({ password: e.target.value })}
+              onKeyPress={this.enterPressed.bind(this)}
+            />
+            <button type="button" onClick={this.handleLogin.bind(this)}>Entrar</button>
+          </form>
+          <p className="error">{this.state.error}</p>
+        </Container>
+        <Footer></Footer>
+      </div>
     );
   }
 }
