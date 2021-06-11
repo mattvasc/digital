@@ -4,9 +4,9 @@
   "description": "Simple Rest API for manage the project",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon",
-    "tsc": "tsc"
+    "build": "tsc -p src"
   },
   "repository": {
     "type": "git",
